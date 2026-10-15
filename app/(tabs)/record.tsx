@@ -120,7 +120,7 @@ export default function RecordingScreen(){
 
         try{
             await recording.pauseAsync();
-            setIsPaused(false);
+            setIsPaused(true);
         } catch (err){
             console.error(err);
         }
