@@ -188,6 +188,57 @@ export default function RecordingScreen(){
                     <Text style={styles.heading}>Record New Lecture</Text>
                     <Text style={styles.subHeading}>Start recording your class</Text>
                 </View>
+
+                <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Subject</Text>
+                    <TextInput style={styles.input} placeholder="e.g. Math, History, Physics..." placeholderTextColor={T.COLORS.muted} value={subject} onChangeText={setSubject} editable={!isRecording} autoCapitalize="words"/>
+                </View>
+
+                <View style={styles.metaRow}>
+                    <View style={styles.metaRow}>
+                        <Text style={styles.metaIcon}>📅</Text>
+                        <Text style={styles.metaLabel}>Date</Text>
+                        <Text style={styles.metaValue}>{date}</Text>
+                    </View>
+                    <View style={styles.metaCard}>
+                        <Text style={styles.metaIcon}>🕐</Text>
+                        <Text style={styles.metaLabel}>Time</Text>
+                        <Text style={styles.metaValue}>{time}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.notice}>
+                    <Text style={styles.noticeText}>
+                        🔒 Recording continues when the screen is off
+                    </Text>
+                </View>
+
+                <View style={styles.timerContainer}>
+                    <Text style={styles.timer}>{formatDuration(duration)}</Text>
+                    {isRecording && (
+                        <Text style={styles.timerStatus}>
+                            {isPaused?'⏸ PAUSED' : '🔴 RECORDING'}
+                        </Text>
+                    )}
+                </View>
+
+                <View style={styles.buttonArea}>
+                    {!isRecording ? (
+                        <Animated.View style={{transform: [{scale: pulsingAnimation}] }}>
+                            <TouchableOpacity style={styles.recordBtn} onPress={startRecording} activeOpacity={0.9}>
+                                <Text style={styles.recordBtnText}>Start Recording</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
+                    ) : (
+                        <View style={styles.controlRow}>
+                            <TouchableOpacity style={styles.pauseBtn} onPress={isPaused?resumingRecording : pauseRecording} activeOpacity={0.8}>
+                                <Text style={styles.pauseBtnText}>
+                                    {isPaused ? '▶ RESUME': '⏸ PAUSE'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -233,5 +284,87 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap:12,
         marginBottom: T.SPACING.md,
-    }
+    },
+    metaCard: {
+        flex:1, backgroundColor: T.COLORS.surface, borderRadius: T.RADIUS.md, borderWidth: 1, borderColor: T.COLORS.border, padding: 14, alignItems:'center', gap: T.SPACING.xs,
+    },
+    metaIcon: {fontSize: 20,},
+    metaLabel: {fontSize: T.FONT.xs,
+        color: T.COLORS.muted,
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    metaValue: {
+        fontSize: T.FONT.sm,
+        color: T.COLORS.myWhite,
+        fontWeight: '700',
+        textAlign: 'center',
+    },
+    notice: {
+        backgroundColor: T.COLORS.purple + '15',
+        borderRadius: T.RADIUS.sm,
+        borderWidth: 1,
+        borderColor: T.COLORS.purple + '33',
+        paddingVertical: T.SPACING.sm + 2,
+        paddingHorizontal: T.SPACING.md,
+        marginBottom: T.SPACING.xl,
+    }, noticeText: {
+        color: T.COLORS.purple,
+        fontSize: T.FONT.sm,
+        fontWeight: '600',
+        textAlign: 'center',
+    }, timerContainer: {alignItems: 'center', marginBottom: T.SPACING.xxl,},
+    timer: {
+        fontSize: 64,
+        fontWeight: '800',
+        color: T.COLORS.myWhite,
+        letterSpacing: -2,
+    }, timerStatus: {
+        fontSize: T.FONT.md,
+        color: T.COLORS.muted,
+        marginTop: T.SPACING.xs + 2,
+        fontWeight: '600',
+    }, buttonArea: {
+        alignItems: 'center',
+        marginBottom: T.SPACING.lg,
+    }, recordBtn: {
+        backgroundColor: T.COLORS.purple, paddingHorizontal: 48, paddingVertical: 18,
+        borderRadius: T.RADIUS.full,
+        shadowColor: T.COLORS.purple,
+        shadowOffset: {width:0,
+            height: 8
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+
+    recordBtnText:{
+        color: T.COLORS.myWhite,
+        fontSize: T.FONT.lg,
+        fontWeight: '800',
+        letterSpacing: -0.3,
+    },
+
+    controlRow: {
+        flexDirection: 'row',
+        gap: T.SPACING.md,
+        alignItems: 'center',
+    },
+
+    pauseBtn: {
+        backgroundColor: T.COLORS.surface,
+        borderWidth: 1,
+        borderColor: T.COLORS.border,
+        paddingHorizontal: 28,
+        paddingVertical: T.SPACING.md,
+        borderRadius: T.RADIUS.full,
+    },
+
+    pauseBtnText: {
+        color: T.COLORS.myWhite,
+        fontSize: T.FONT.base - 1,
+        fontWeight: '700',
+    },
 }) 
