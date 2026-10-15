@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import {View, Text, TextInput, StyleSheet, StatusBar, Animated, Alert} from 'react-native';
+import * as T from '@/constants';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Animated, Platform, Alert} from 'react-native';
 
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -168,8 +169,69 @@ export default function RecordingScreen(){
             setDuration(0);
             setSubject('');
 
+            Alert.alert(
+                'LECTURE SAVED!',
+                `${subject} - ${formatDuration(duration)}\n\nReady to process into notes.`
+            );
         } catch(err){
-
+            Alert.alert('Error', 'Could not stop recording.');
+            console.error(err);
         }
     }
+
+    return (
+        <SafeAreaView style={styles.safe}>
+            <StatusBar barStyle="light-content" backgroundColor={T.COLORS.bg}/>
+
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.heading}>Record New Lecture</Text>
+                    <Text style={styles.subHeading}>Start recording your class</Text>
+                </View>
+            </View>
+        </SafeAreaView>
+    );
 }
+
+const styles = StyleSheet.create({
+    safe: {
+        flex:1,
+        backgroundColor: T.COLORS.bg,
+    },
+    container: {
+        flex:1,
+        paddingHorizontal: T.SPACING.md,
+        paddingTop: T.SPACING.sm,
+    }, header: {marginBottom: T.SPACING.xl,}, heading: {
+        fontSize: T.FONT.xxl,
+        fontWeight: '800',
+        color: T.COLORS.myWhite,
+        letterSpacing: -1,
+    }, 
+    subHeading: {
+        fontSize: T.FONT.md,
+        color: T.COLORS.muted,
+        marginTop: T.SPACING.xs,
+    }, inputGroup: {marginBottom: T.SPACING.md,},
+    label:{
+        fontSize: T.FONT.xs,
+        fontWeight: '700',
+        color: T.COLORS.muted,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: T.SPACING.sm,
+    }, input: {
+        backgroundColor: T.COLORS.surface,
+        borderRadius: T.RADIUS.md,
+        borderWidth: 1,
+        borderColor: T.COLORS.border,
+        padding: T.SPACING.md,
+        fontSize: T.FONT.base,
+        color: T.COLORS.myWhite,
+        fontWeight: '600',
+    }, metaRow: {
+        flexDirection: 'row',
+        gap:12,
+        marginBottom: T.SPACING.md,
+    }
+}) 
