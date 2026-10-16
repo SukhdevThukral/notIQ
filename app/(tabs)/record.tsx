@@ -196,53 +196,44 @@ export default function RecordingScreen(){
                         <TextInput style={styles.input} placeholder="e.g. Math, Biology, History..."placeholderTextColor={T.COLORS.lightSubtle} value={subject} onChangeText={setSubject} autoCapitalize="words"/>
                     </View>
                 )}
-                    <View style={styles.metaRow}>
-                        <View style={styles.metaCard, {backgroundColor: T.COLORS.pastelPurp}}>
-                            <Text style={styles.metaIcon}>📅</Text>
-                            <Text style={styles.metaLabel}>Date</Text>
-                            <Text style={styles.metaValue}>{date}</Text>
-                        </View>
-                        <View style={styles.metaCard}>
-                            <Text style={styles.metaIcon}>🕐</Text>
-                            <Text style={styles.metaLabel}>Time</Text>
-                            <Text style={styles.metaValue}>{time}</Text>
-                        </View>
+                <View style={styles.metaRow}>
+                    <View style={styles.metaCard, {backgroundColor: T.COLORS.pastelPurp}}>
+                        <Text style={styles.metaIcon}>📅</Text>
+                        <Text style={styles.metaLabel}>Date</Text>
+                        <Text style={styles.metaValue}>{date}</Text>
                     </View>
-            </ScrollView>
-
-
-                <View style={styles.notice}>
-                    <Text style={styles.noticeText}>
-                        🔒 Recording continues when the screen is off
-                    </Text>
+                    <View style={styles.metaCard}>
+                        <Text style={styles.metaIcon}>🕐</Text>
+                        <Text style={styles.metaLabel}>Time</Text>
+                        <Text style={styles.metaValue}>{time}</Text>
+                    </View>
                 </View>
 
-                <View style={styles.timerContainer}>
+                <View style={[styles.timerCard, {
+                    backgroundColor: isRecording? (isPaused?T.COLORS.pastelOrange: T.COLORS.pastelPink) : T.COLORS.myWhite,
+                }]}>
                     <Text style={styles.timer}>{formatDuration(duration)}</Text>
-                    {isRecording && (
-                        <Text style={styles.timerStatus}>
-                            {isPaused?'⏸ PAUSED' : '🔴 RECORDING'}
-                        </Text>
-                    )}
+                    <Text style={styles.timerStatus}>
+                        {isRecording? 'Ready to record' : isPaused ? '⏸ PAUSED' : '🔴 RECORDING'}
+                    </Text>
                 </View>
 
                 <View style={styles.buttonArea}>
                     {!isRecording ? (
                         <Animated.View style={{transform: [{scale: pulsingAnimation}] }}>
-                            <TouchableOpacity style={styles.recordBtn} onPress={startRecording} activeOpacity={0.9}>
-                                <Text style={styles.recordBtnText}>Start Recording</Text>
+                            <TouchableOpacity style={[styles.mainBtn, {
+                                backgroundColor: subjectColor
+                            }]} onPress={startRecording} activeOpacity={0.85}>
+                                <Text style={styles.controlBtnText}>
+                                    {isPaused ? '▶ RESUME' : '⏸ PAUSE'}
+                                </Text>
                             </TouchableOpacity>
                         </Animated.View>
                     ) : (
-                        <View style={styles.controlRow}>
-                            <TouchableOpacity style={styles.pauseBtn} onPress={isPaused?resumingRecording : pauseRecording} activeOpacity={0.8}>
-                                <Text style={styles.pauseBtnText}>
-                                    {isPaused ? '▶ RESUME': '⏸ PAUSE'}
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+
                     )}
                 </View>
+            </ScrollView>
             </View>
         </SafeAreaView>
     );
@@ -306,57 +297,65 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     }, 
     
-    timerContainer: {alignItems: 'center', marginBottom: T.SPACING.xxl,},
+    timerCard: {alignItems: 'center', marginBottom: T.SPACING.lg,
+        padding: T.SPACING.xl,
+        borderRadius: T.RADIUS.lg + 6,
+    },
     timer: {
-        fontSize: 64,
-        fontWeight: '800',
-        color: T.COLORS.myWhite,
-        letterSpacing: -2,
+        fontSize: 72,
+        fontWeight: '900',
+        color: T.COLORS.lightText,
+        letterSpacing: -3,
     }, timerStatus: {
         fontSize: T.FONT.md,
-        color: T.COLORS.muted,
-        marginTop: T.SPACING.xs + 2,
-        fontWeight: '600',
+        color: T.COLORS.lightMuted,
+        marginTop: T.SPACING.xs,
+        fontWeight: '700',
     }, buttonArea: {
         alignItems: 'center',
-        marginBottom: T.SPACING.lg,
-    }, recordBtn: {
-        backgroundColor: T.COLORS.purple, paddingHorizontal: 48, paddingVertical: 18,
+        marginBottom: T.SPACING.md,
+    }, mainBtn: {
+        paddingHorizontal: 48, paddingVertical: 18,
         borderRadius: T.RADIUS.full,
-        shadowColor: T.COLORS.purple,
+        shadowColor: '#000',
         shadowOffset: {width:0,
-            height: 8
+            height: 4
         },
-        shadowOpacity: 0.5,
-        shadowRadius: 20,
-        elevation: 10,
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 6,
     },
-
-    recordBtnText:{
-        color: T.COLORS.myWhite,
+    mainBtnText:{
+        color: T.COLORS.lightText,
         fontSize: T.FONT.lg,
-        fontWeight: '800',
+        fontWeight: '900',
         letterSpacing: -0.3,
     },
 
     controlRow: {
         flexDirection: 'row',
-        gap: T.SPACING.md,
-        alignItems: 'center',
+        gap: 12,
     },
 
-    pauseBtn: {
-        backgroundColor: T.COLORS.surface,
-        borderWidth: 1,
-        borderColor: T.COLORS.border,
+    controlBtn: {
         paddingHorizontal: 28,
         paddingVertical: T.SPACING.md,
         borderRadius: T.RADIUS.full,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 3},
+        shadowOpacity: 0.15,
+        shadowRadius: 8,
     },
 
-    pauseBtnText: {
-        color: T.COLORS.myWhite,
-        fontSize: T.FONT.base - 1,
-        fontWeight: '700',
+    controlBtnText: {
+        color: T.COLORS.lightText,
+        fontSize: T.FONT.base,
+        fontWeight: '800',
     },
+    tip: {
+        textAlign: 'center', color: T.COLORS.lightSubtle,
+        fontSize: T.FONT.sm,
+        lineHeight: 20,
+    }
 }) 
