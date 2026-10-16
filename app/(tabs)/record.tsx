@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import * as T from '@/constants';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, StatusBar, Animated, Platform, Alert} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Platform, Alert} from 'react-native';
 
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import {Audio} from 'expo-av';
+import {useAudioRecorder, AudioModule, RecordingPresets} from 'expo-audio';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import {StatusBar} from 'expo-status-bar';
 
 function getFormattedDate(){
     const now = new Date();
@@ -38,8 +40,8 @@ export default function RecordingScreen(){
     const [isRecording,setIsRecording] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [duration, setDuration] = useState(0);
-    const [recording, setRecording] = useState<Audio.Recording | null>(null);
 
+    const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const pulsingAnimation = useRef(new Animated.Value(1)).current;
@@ -74,7 +76,7 @@ export default function RecordingScreen(){
     },[isRecording, isPaused]);
 
     async function requestPermissions(){
-        const {status} = await Audio.requestPermissionsAsync();
+        const {status} = await AudioModule.requestRecordingPermissionsAsync();
         if (status !== 'granted'){
             Alert.alert('Permission needed', 'Microphone access is required to record lectures.');
             return false;
@@ -93,19 +95,8 @@ export default function RecordingScreen(){
 
 
         try{
-            await Audio.setAudioModeAsync({
-                allowsRecordingIOS: true,
-                playsInSilentModeIOS: true,
-                staysActiveInBackground: true,
-                shouldDuckAndroid: false,
-                playThroughEarpieceAndroid: false,
-            });
-
-            const {recording} = await Audio.Recording.createAsync(
-                Audio.RecordingOptionsPresets.HIGH_QUALITY
-            );
-
-            setRecording(recording);
+            await audioRecorder.prepareToRecordAsync()
+            audioRecorder.record();
             setIsRecording(true);
             setIsPaused(false);
             setDuration(0);
@@ -116,10 +107,8 @@ export default function RecordingScreen(){
     }
 
     async function pauseRecording() {
-        if (!recording){return;}
-
         try{
-            await recording.pauseAsync();
+            audioRecorder.pause();
             setIsPaused(true);
         } catch (err){
             console.error(err);
@@ -127,11 +116,8 @@ export default function RecordingScreen(){
     }
 
     async function resumingRecording(){
-        if (!recording){
-            return;
-        }
         try{
-            await recording.startAsync();
+            audioRecorder.record();
             setIsPaused(false);
         }catch(err){
             console.error(err);
@@ -139,12 +125,9 @@ export default function RecordingScreen(){
     }
 
     async function stopRecording(){
-        if (!recording){
-            return;
-        }
         try{
-            await recording.stopAndUnloadAsync();
-            const uri = recording.getURI();
+            await audioRecorder.stop();
+            const uri = audioRecorder.uri;
 
             const lectureData = {
                 id: Date.now().toString(),
@@ -165,7 +148,6 @@ export default function RecordingScreen(){
 
             setIsRecording(false);
             setIsPaused(false);
-            setRecording(null);
             setDuration(0);
             setSubject('');
 
@@ -181,7 +163,7 @@ export default function RecordingScreen(){
 
     return (
         <SafeAreaView style={styles.safe}>
-            <StatusBar barStyle="light-content" backgroundColor={T.COLORS.bg}/>
+            <StatusBar style="light"/>
 
             <View style={styles.container}>
                 <View style={styles.header}>
