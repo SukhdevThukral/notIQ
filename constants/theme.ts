@@ -11,6 +11,17 @@ export const COLORS = {
     orange: '#fb923c',
     pink: '#f472b6',
     yellow: '#facc15',
+
+    lightBg: '#F5F0E8',
+    lightText: '#1a1a2e',
+    lightMuted: '#777777',
+    lightSubtle: '#AAAAAA',
+
+    pastelPurp: '#c9b8ff',
+    pastelGreen: '#a8e6cf',
+    pastelOrange: '#ffd3a5',
+    pastelPink: '#ffb3c6',
+    pastelBlue: '#b3e5fc'
 };
 
 export const SUBJECT_COLORS: Record<string, string> = {
@@ -22,6 +33,14 @@ export const SUBJECT_COLORS: Record<string, string> = {
     Chemistry: COLORS.yellow,
     Default: COLORS.purple,
 };
+
+export const PASTEL_COLORS = [
+    COLORS.pastelPurp,
+    COLORS.pastelGreen,
+    COLORS.pastelOrange,
+    COLORS.pastelPink,
+    COLORS.pastelBlue,
+];
 
 export const FONT = {
     xs:11,
