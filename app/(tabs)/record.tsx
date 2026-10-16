@@ -36,9 +36,9 @@ function formatDuration(seconds:number){
 function getSubjectColor(subject: string){
     if (!subject){
         return T.COLORS.pastelPurp;
-        const index = subject.charCodeAt(0) % T.PASTEL_COLORS.length;
-        return T.PASTEL_COLORS[index]
     }
+    const index = subject.charCodeAt(0) % T.PASTEL_COLORS.length;
+    return T.PASTEL_COLORS[index]
 }
 
 export default function RecordingScreen(){
@@ -177,7 +177,7 @@ export default function RecordingScreen(){
             <StatusBar style="dark"/>
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 <View style={styles.header}>
-                    {isRecording? (
+                    {!isRecording? (
                         <>
                             <Text style={styles.heading}>What are we{'\n'} learning today?</Text>
                             <Text style={styles.subHeading}>Drop the subject and hit record..</Text>
@@ -197,12 +197,12 @@ export default function RecordingScreen(){
                     </View>
                 )}
                 <View style={styles.metaRow}>
-                    <View style={styles.metaCard, {backgroundColor: T.COLORS.pastelPurp}}>
+                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelPurp}]}>
                         <Text style={styles.metaIcon}>📅</Text>
                         <Text style={styles.metaLabel}>Date</Text>
                         <Text style={styles.metaValue}>{date}</Text>
                     </View>
-                    <View style={styles.metaCard}>
+                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelGreen}]}>
                         <Text style={styles.metaIcon}>🕐</Text>
                         <Text style={styles.metaLabel}>Time</Text>
                         <Text style={styles.metaValue}>{time}</Text>
@@ -214,7 +214,7 @@ export default function RecordingScreen(){
                 }]}>
                     <Text style={styles.timer}>{formatDuration(duration)}</Text>
                     <Text style={styles.timerStatus}>
-                        {isRecording? 'Ready to record' : isPaused ? '⏸ PAUSED' : '🔴 RECORDING'}
+                        {!isRecording? 'Ready to record' : isPaused ? '⏸ PAUSED' : '🔴 RECORDING'}
                     </Text>
                 </View>
 
@@ -224,17 +224,33 @@ export default function RecordingScreen(){
                             <TouchableOpacity style={[styles.mainBtn, {
                                 backgroundColor: subjectColor
                             }]} onPress={startRecording} activeOpacity={0.85}>
-                                <Text style={styles.controlBtnText}>
-                                    {isPaused ? '▶ RESUME' : '⏸ PAUSE'}
+                                <Text style={styles.mainBtnText}>
+                                    🎙️ Start Recording
                                 </Text>
                             </TouchableOpacity>
                         </Animated.View>
                     ) : (
+                        <View style={styles.controlRow}>
+                            <TouchableOpacity style={[styles.controlBtn, {
+                                backgroundColor: isPaused ? T.COLORS.pastelGreen : T.COLORS.pastelOrange
+                            }]} onPress={isPaused? resumingRecording:pauseRecording} activeOpacity={0.8}>
+                                <Text style={styles.controlBtnText}>
+                                    {isPaused ? '▶ RESUME' : '⏸ PAUSE'}
+                                </Text>
+                            </TouchableOpacity>
 
+                            <TouchableOpacity style={[styles.controlBtn, {backgroundColor: T.COLORS.pastelPink}]} onPress={stopRecording} activeOpacity={0.8}>
+                                <Text style={styles.controlBtnText}>⏹ STOP</Text>
+                            </TouchableOpacity>
+                        </View>
                     )}
                 </View>
+
+                {!isRecording && (
+                    <Text style={styles.tip}>💡 youre advised to sit close to the speak for best results</Text> 
+                )}
+
             </ScrollView>
-            </View>
         </SafeAreaView>
     );
 }
@@ -260,8 +276,8 @@ const styles = StyleSheet.create({
         color: T.COLORS.lightMuted,
         marginTop: T.SPACING.xs,
     }, inputCard: {marginBottom: T.RADIUS.lg,
-        borderRadius: 2,
-        borderWidth: T.SPACING.md,
+        borderRadius: T.RADIUS.lg,
+        borderWidth: 2,
         padding: T.SPACING.md,
     },
     label:{
@@ -274,7 +290,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: T.FONT.lg,
         color: T.COLORS.lightText,
-        fontWeight: '600',
     }, metaRow: {
         flexDirection: 'row',
         gap:12,
