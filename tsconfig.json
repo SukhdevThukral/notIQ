@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "ignoreDeprecations": "6.0",
+    "jsx": "react-native",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
