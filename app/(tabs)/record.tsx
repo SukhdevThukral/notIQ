@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import * as T from '@/constants';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, Animated, Platform, Alert} from 'react-native';
+import {View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animated, Alert} from 'react-native';
 
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,6 +33,14 @@ function formatDuration(seconds:number){
     return `${mins}:${secs}`;
 }
 
+function getSubjectColor(subject: string){
+    if (!subject){
+        return T.COLORS.pastelPurp;
+        const index = subject.charCodeAt(0) % T.PASTEL_COLORS.length;
+        return T.PASTEL_COLORS[index]
+    }
+}
+
 export default function RecordingScreen(){
     const [subject,setSubject] = useState('');
     const [date] = useState(getFormattedDate());
@@ -46,11 +54,14 @@ export default function RecordingScreen(){
 
     const pulsingAnimation = useRef(new Animated.Value(1)).current;
 
+    const subjectColor = getSubjectColor(subject);
+
     useEffect(() => {
         if(isRecording && !isPaused){
             Animated.loop(
                 Animated.sequence([
-                    Animated.timing(pulsingAnimation, {toValue: 1.2, duration: 800, useNativeDriver: true,}),
+                    Animated.timing(pulsingAnimation, {toValue: 1.08, duration: 700, useNativeDriver: true,}),
+                    Animated.timing(pulsingAnimation, {toValue: 1, duration: 700, useNativeDriver: true,}),
                 ])
             ).start();
         } else {
@@ -86,7 +97,7 @@ export default function RecordingScreen(){
 
     async function startRecording(){
         if (!subject.trim()) {
-            Alert.alert('Add a subject', 'Enter the subject before recording.');
+            Alert.alert('HOLLUP', 'What subject is this lecture for?');
             return;
         }
 
@@ -163,31 +174,42 @@ export default function RecordingScreen(){
 
     return (
         <SafeAreaView style={styles.safe}>
-            <StatusBar style="light"/>
-
-            <View style={styles.container}>
+            <StatusBar style="dark"/>
+            <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 <View style={styles.header}>
-                    <Text style={styles.heading}>Record New Lecture</Text>
-                    <Text style={styles.subHeading}>Start recording your class</Text>
+                    {isRecording? (
+                        <>
+                            <Text style={styles.heading}>What are we{'\n'} learning today?</Text>
+                            <Text style={styles.subHeading}>Drop the subject and hit record..</Text>
+                        </>
+                    ) : (
+                        <>
+                            <Text style={styles.heading}>{isPaused ? 'take a breather' : `recording ${subject}`}</Text>
+                            <Text style={styles.subHeading}>{isPaused ? 'resume when youre ready' : `screen can be off we gotchu!`}</Text>
+                        </>
+                    )}
                 </View>
 
-                <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Subject</Text>
-                    <TextInput style={styles.input} placeholder="e.g. Math, History, Physics..." placeholderTextColor={T.COLORS.muted} value={subject} onChangeText={setSubject} editable={!isRecording} autoCapitalize="words"/>
-                </View>
-
-                <View style={styles.metaRow}>
+                {!isRecording && (
+                    <View style={[styles.inputCard, {borderColor: subjectColor,backgroundColor: subjectColor + '33', }]}>
+                        <Text style={styles.label}>SUBJECT</Text>
+                        <TextInput style={styles.input} placeholder="e.g. Math, Biology, History..."placeholderTextColor={T.COLORS.lightSubtle} value={subject} onChangeText={setSubject} autoCapitalize="words"/>
+                    </View>
+                )}
                     <View style={styles.metaRow}>
-                        <Text style={styles.metaIcon}>📅</Text>
-                        <Text style={styles.metaLabel}>Date</Text>
-                        <Text style={styles.metaValue}>{date}</Text>
+                        <View style={styles.metaCard, {backgroundColor: T.COLORS.pastelPurp}}>
+                            <Text style={styles.metaIcon}>📅</Text>
+                            <Text style={styles.metaLabel}>Date</Text>
+                            <Text style={styles.metaValue}>{date}</Text>
+                        </View>
+                        <View style={styles.metaCard}>
+                            <Text style={styles.metaIcon}>🕐</Text>
+                            <Text style={styles.metaLabel}>Time</Text>
+                            <Text style={styles.metaValue}>{time}</Text>
+                        </View>
                     </View>
-                    <View style={styles.metaCard}>
-                        <Text style={styles.metaIcon}>🕐</Text>
-                        <Text style={styles.metaLabel}>Time</Text>
-                        <Text style={styles.metaValue}>{time}</Text>
-                    </View>
-                </View>
+            </ScrollView>
+
 
                 <View style={styles.notice}>
                     <Text style={styles.noticeText}>
@@ -229,38 +251,38 @@ export default function RecordingScreen(){
 const styles = StyleSheet.create({
     safe: {
         flex:1,
-        backgroundColor: T.COLORS.bg,
+        backgroundColor: T.COLORS.lightBg,
     },
-    container: {
-        flex:1,
+    scroll: {
         paddingHorizontal: T.SPACING.md,
-        paddingTop: T.SPACING.sm,
-    }, header: {marginBottom: T.SPACING.xl,}, heading: {
-        fontSize: T.FONT.xxl,
-        fontWeight: '800',
-        color: T.COLORS.myWhite,
+        paddingTop: T.SPACING.md,
+        paddingBottom: T.SPACING.xxl,
+    }, header: {marginBottom: T.SPACING.lg,}, heading: {
+        fontSize: 36,
+        fontWeight: '900',
+        color: T.COLORS.lightText,
         letterSpacing: -1,
+        lineHeight: 42,
     }, 
     subHeading: {
         fontSize: T.FONT.md,
-        color: T.COLORS.muted,
+        color: T.COLORS.lightMuted,
         marginTop: T.SPACING.xs,
-    }, inputGroup: {marginBottom: T.SPACING.md,},
+    }, inputCard: {marginBottom: T.RADIUS.lg,
+        borderRadius: 2,
+        borderWidth: T.SPACING.md,
+        padding: T.SPACING.md,
+    },
     label:{
         fontSize: T.FONT.xs,
-        fontWeight: '700',
-        color: T.COLORS.muted,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-        marginBottom: T.SPACING.sm,
+        fontWeight: '800',
+        color: T.COLORS.lightMuted,
+        letterSpacing: 1.5,
+        marginBottom: T.SPACING.xs,
     }, input: {
-        backgroundColor: T.COLORS.surface,
-        borderRadius: T.RADIUS.md,
-        borderWidth: 1,
-        borderColor: T.COLORS.border,
-        padding: T.SPACING.md,
-        fontSize: T.FONT.base,
-        color: T.COLORS.myWhite,
+        fontWeight: '700',
+        fontSize: T.FONT.lg,
+        color: T.COLORS.lightText,
         fontWeight: '600',
     }, metaRow: {
         flexDirection: 'row',
@@ -268,35 +290,23 @@ const styles = StyleSheet.create({
         marginBottom: T.SPACING.md,
     },
     metaCard: {
-        flex:1, backgroundColor: T.COLORS.surface, borderRadius: T.RADIUS.md, borderWidth: 1, borderColor: T.COLORS.border, padding: 14, alignItems:'center', gap: T.SPACING.xs,
+        flex:1, 
+        borderRadius: T.RADIUS.lg, alignItems:'center', gap: T.SPACING.xs, padding: T.SPACING.md,
     },
-    metaIcon: {fontSize: 20,},
+    metaIcon: {fontSize: 22,},
     metaLabel: {fontSize: T.FONT.xs,
-        color: T.COLORS.muted,
-        fontWeight: '600',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
+        color: T.COLORS.lightMuted,
+        fontWeight: '800',
+        letterSpacing: 1.5,
     },
     metaValue: {
         fontSize: T.FONT.sm,
-        color: T.COLORS.myWhite,
-        fontWeight: '700',
+        color: T.COLORS.lightText,
+        fontWeight: '800',
         textAlign: 'center',
-    },
-    notice: {
-        backgroundColor: T.COLORS.purple + '15',
-        borderRadius: T.RADIUS.sm,
-        borderWidth: 1,
-        borderColor: T.COLORS.purple + '33',
-        paddingVertical: T.SPACING.sm + 2,
-        paddingHorizontal: T.SPACING.md,
-        marginBottom: T.SPACING.xl,
-    }, noticeText: {
-        color: T.COLORS.purple,
-        fontSize: T.FONT.sm,
-        fontWeight: '600',
-        textAlign: 'center',
-    }, timerContainer: {alignItems: 'center', marginBottom: T.SPACING.xxl,},
+    }, 
+    
+    timerContainer: {alignItems: 'center', marginBottom: T.SPACING.xxl,},
     timer: {
         fontSize: 64,
         fontWeight: '800',
