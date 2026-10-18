@@ -68,3 +68,8 @@ export const SPACING = {
     xl: 32,
     xxl: 40,
 };
+
+export const FONTS_FAMILY = {
+    bold: 'PlusJakartaSans_700Bold',
+    extrabold: 'PlusJakartaSans_800ExtraBold',
+};
