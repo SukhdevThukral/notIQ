@@ -44,7 +44,7 @@ function getSubjectColor(subject: string){
 export default function RecordingScreen(){
     const [subject,setSubject] = useState('');
     const [date] = useState(getFormattedDate());
-    const [time] = useState(getFormattedTime());
+    const [time, setTime] = useState(getFormattedTime());
     const [isRecording,setIsRecording] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [duration, setDuration] = useState(0);
@@ -55,6 +55,13 @@ export default function RecordingScreen(){
     const pulsingAnimation = useRef(new Animated.Value(1)).current;
 
     const subjectColor = getSubjectColor(subject);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTime(getFormattedTime());
+        }, 1000);
+        return()=> clearInterval(interval);
+    },[])
 
     useEffect(() => {
         if(isRecording && !isPaused){
@@ -176,59 +183,68 @@ export default function RecordingScreen(){
         <SafeAreaView style={styles.safe}>
             <StatusBar style="dark"/>
             <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-                <View style={styles.header}>
+
+                <View style={[styles.heroCard, {backgroundColor: subjectColor}]}>
                     {!isRecording? (
                         <>
-                            <Text style={styles.heading}>What are we{'\n'} learning today?</Text>
-                            <Text style={styles.subHeading}>Drop the subject and hit record..</Text>
+                            <Text style={styles.heroText}>
+                                you suck at{'\n'}taking notes, {'\n'}we got you :)
+                            </Text>
+                            <Text style={styles.heroSub}>drop the subject below..</Text>
                         </>
                     ) : (
                         <>
-                            <Text style={styles.heading}>{isPaused ? 'take a breather' : `recording ${subject}`}</Text>
-                            <Text style={styles.subHeading}>{isPaused ? 'resume when youre ready' : `screen can be off we gotchu!`}</Text>
+                            <Text style={styles.heroText}>{isPaused ? 'take a breather' : `recording ${subject}`}</Text>
+                            <Text style={styles.heroSub}>{isPaused ? 'resume when youre ready' : `screen can be off we gotchu!`}</Text>
                         </>
                     )}
                 </View>
 
                 {!isRecording && (
-                    <View style={[styles.inputCard, {borderColor: subjectColor,backgroundColor: subjectColor + '33', }]}>
-                        <Text style={styles.label}>SUBJECT</Text>
-                        <TextInput style={styles.input} placeholder="e.g. Math, Biology, History..."placeholderTextColor={T.COLORS.lightSubtle} value={subject} onChangeText={setSubject} autoCapitalize="words"/>
+                    <View style={[styles.subjectCard , {backgroundColor: T.COLORS.pastelGreen}]}>
+                        <Text style={styles.cardLabel}>SUBJECT</Text>
+                        <TextInput style={styles.subjectInput} placeholder="e.g. Math, Biology, History..."placeholderTextColor={T.COLORS.lightSubtle} value={subject} onChangeText={setSubject} autoCapitalize="words"/>
                     </View>
                 )}
+
                 <View style={styles.metaRow}>
-                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelPurp}]}>
+                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelPurp, transform: [{rotate: '-2deg'}], }]}>
+
                         <Text style={styles.metaIcon}>📅</Text>
                         <Text style={styles.metaLabel}>Date</Text>
                         <Text style={styles.metaValue}>{date}</Text>
+
                     </View>
-                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelGreen}]}>
+
+                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelGreen, transform: [{rotate: '1.5deg'}], }]}>
                         <Text style={styles.metaIcon}>🕐</Text>
                         <Text style={styles.metaLabel}>Time</Text>
                         <Text style={styles.metaValue}>{time}</Text>
                     </View>
                 </View>
 
-                <View style={[styles.timerCard, {
-                    backgroundColor: isRecording? (isPaused?T.COLORS.pastelOrange: T.COLORS.pastelPink) : T.COLORS.myWhite,
+                <Animated.View style={[styles.timerCard, {
+                    backgroundColor: isRecording ? (isPaused?T.COLORS.pastelOrange:T.COLORS.pastelPink): T.COLORS.myWhite,
+
+                    transform: [
+                        {rotate:isRecording?'-1deg' : '1deg'}, {scale: pulsingAnimation},
+                    ],
                 }]}>
                     <Text style={styles.timer}>{formatDuration(duration)}</Text>
                     <Text style={styles.timerStatus}>
-                        {!isRecording? 'Ready to record' : isPaused ? '⏸ PAUSED' : '🔴 RECORDING'}
+                        { !isRecording ? 'ready to record': isPaused? '⏸paused': '🔴 recording'}
                     </Text>
-                </View>
+                </Animated.View>
 
                 <View style={styles.buttonArea}>
                     {!isRecording ? (
-                        <Animated.View style={{transform: [{scale: pulsingAnimation}] }}>
-                            <TouchableOpacity style={[styles.mainBtn, {
-                                backgroundColor: subjectColor
-                            }]} onPress={startRecording} activeOpacity={0.85}>
-                                <Text style={styles.mainBtnText}>
-                                    🎙️ Start Recording
-                                </Text>
-                            </TouchableOpacity>
-                        </Animated.View>
+                        <TouchableOpacity style={[styles.mainBtn, {
+                            backgroundColor: T.COLORS.lightText
+                        }]} onPress={startRecording} activeOpacity={0.85}>
+                            <Text style={[styles.mainBtnText, {color: T.COLORS.lightBg}]}>
+                                🎙️ start recording
+                            </Text>
+                        </TouchableOpacity>
                     ) : (
                         <View style={styles.controlRow}>
                             <TouchableOpacity style={[styles.controlBtn, {
@@ -264,86 +280,147 @@ const styles = StyleSheet.create({
         paddingHorizontal: T.SPACING.md,
         paddingTop: T.SPACING.md,
         paddingBottom: T.SPACING.xxl,
-    }, header: {marginBottom: T.SPACING.lg,}, heading: {
-        fontSize: 36,
-        fontWeight: '900',
-        color: T.COLORS.lightText,
-        letterSpacing: -1,
-        lineHeight: 42,
     }, 
-    subHeading: {
+    
+    heroCard: {
+        borderRadius: 24,
+        padding: 24,
+        marginBottom: 16,
+        transform: [{rotate: '-1.5deg'}],
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+        elevation: 4,
+    }, 
+
+    heroText: {
+        fontSize: 38,
+        fontFamily: T.FONTS_FAMILY.extrabold,
+        color: T.COLORS.lightMuted,
+        letterSpacing: -1.5,
+        lineHeight: 44,
+    }, 
+
+    heroSub: {
         fontSize: T.FONT.md,
-        color: T.COLORS.lightMuted,
-        marginTop: T.SPACING.xs,
-    }, inputCard: {marginBottom: T.RADIUS.lg,
-        borderRadius: T.RADIUS.lg,
-        borderWidth: 2,
-        padding: T.SPACING.md,
-    },
-    label:{
-        fontSize: T.FONT.xs,
-        fontWeight: '800',
-        color: T.COLORS.lightMuted,
-        letterSpacing: 1.5,
-        marginBottom: T.SPACING.xs,
-    }, input: {
-        fontWeight: '700',
-        fontSize: T.FONT.lg,
         color: T.COLORS.lightText,
-    }, metaRow: {
+        opacity: 0.6,
+        marginTop: 8,
+        fontWeight: '600',
+    },
+    
+    subjectCard: {
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 16,
+        transform: [{rotate: '1deg'}],
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        }, shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 3,
+    },
+
+    cardLabel: {
+        fontSize: T.FONT.xs,
+        fontFamily: T.FONTS_FAMILY.extrabold,
+        color: T.COLORS.lightText,
+        letterSpacing: 2,
+        opacity: 0.5,
+        marginBottom: 8,
+    },
+
+    subjectInput: {
+        fontSize: T.FONT.xl,
+        fontFamily: T.FONTS_FAMILY.bold,
+        color: T.COLORS.lightText,
+        letterSpacing: -0.5
+    },
+    
+    metaRow: {
         flexDirection: 'row',
         gap:12,
         marginBottom: T.SPACING.md,
     },
     metaCard: {
         flex:1, 
-        borderRadius: T.RADIUS.lg, alignItems:'center', gap: T.SPACING.xs, padding: T.SPACING.md,
+        borderRadius: 20, alignItems:'center', gap: T.SPACING.xs, padding: T.SPACING.md,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
     },
-    metaIcon: {fontSize: 22,},
+    metaIcon: {fontSize: 24,},
     metaLabel: {fontSize: T.FONT.xs,
         color: T.COLORS.lightMuted,
-        fontWeight: '800',
+        fontFamily: T.FONTS_FAMILY.bold,
         letterSpacing: 1.5,
     },
     metaValue: {
         fontSize: T.FONT.sm,
         color: T.COLORS.lightText,
-        fontWeight: '800',
+        fontFamily: T.FONTS_FAMILY.bold,
         textAlign: 'center',
     }, 
     
-    timerCard: {alignItems: 'center', marginBottom: T.SPACING.lg,
+    timerCard: {
+        alignItems: 'center', 
+        marginBottom: T.SPACING.lg,
         padding: T.SPACING.xl,
-        borderRadius: T.RADIUS.lg + 6,
+        borderRadius: 24,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 12,
+        elevation: 4,
+
     },
     timer: {
-        fontSize: 72,
-        fontWeight: '900',
+        fontSize: 76,
+        fontFamily: T.FONTS_FAMILY.extrabold,
         color: T.COLORS.lightText,
-        letterSpacing: -3,
-    }, timerStatus: {
+        letterSpacing: -4,
+    }, 
+    timerStatus: {
         fontSize: T.FONT.md,
-        color: T.COLORS.lightMuted,
+        color: T.COLORS.lightText,
         marginTop: T.SPACING.xs,
-        fontWeight: '700',
-    }, buttonArea: {
+        fontFamily: T.FONTS_FAMILY.bold,
+    }, 
+    
+    buttonArea: {
         alignItems: 'center',
         marginBottom: T.SPACING.md,
-    }, mainBtn: {
+
+    }, 
+    
+    mainBtn: {
         paddingHorizontal: 48, paddingVertical: 18,
         borderRadius: T.RADIUS.full,
         shadowColor: '#000',
         shadowOffset: {width:0,
             height: 4
         },
-        shadowOpacity: 0.15,
+        shadowOpacity: 0.2,
         shadowRadius: 12,
         elevation: 6,
     },
     mainBtnText:{
-        color: T.COLORS.lightText,
         fontSize: T.FONT.lg,
-        fontWeight: '900',
+        fontFamily: T.FONTS_FAMILY.extrabold,
         letterSpacing: -0.3,
     },
 
@@ -359,14 +436,14 @@ const styles = StyleSheet.create({
         elevation: 4,
         shadowColor: '#000',
         shadowOffset: {width: 0, height: 3},
-        shadowOpacity: 0.15,
+        shadowOpacity: 0.12,
         shadowRadius: 8,
     },
 
     controlBtnText: {
         color: T.COLORS.lightText,
         fontSize: T.FONT.base,
-        fontWeight: '800',
+        fontFamily: T.FONTS_FAMILY.bold,
     },
     tip: {
         textAlign: 'center', color: T.COLORS.lightSubtle,
