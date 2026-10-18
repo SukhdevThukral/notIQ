@@ -188,14 +188,14 @@ export default function RecordingScreen(){
                     {!isRecording? (
                         <>
                             <Text style={styles.heroText}>
-                                you suck at{'\n'}taking notes, {'\n'}we got you :)
+                                you suck at{'\n'}taking notes{'\n'}brother, {'\n'}we gotchu ;)
                             </Text>
                             <Text style={styles.heroSub}>drop the subject below..</Text>
                         </>
                     ) : (
                         <>
-                            <Text style={styles.heroText}>{isPaused ? 'take a breather' : `recording ${subject}`}</Text>
-                            <Text style={styles.heroSub}>{isPaused ? 'resume when youre ready' : `screen can be off we gotchu!`}</Text>
+                            <Text style={styles.heroText}>{isPaused ? 'take a{"\n"} breather' : `recording\n${subject}\ncovered`}</Text>
+                            <Text style={styles.heroSub}>{isPaused ? 'resume when ready' : `screen can be off we gotchu!`}</Text>
                         </>
                     )}
                 </View>
@@ -208,16 +208,14 @@ export default function RecordingScreen(){
                 )}
 
                 <View style={styles.metaRow}>
-                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelPurp, transform: [{rotate: '-2deg'}], }]}>
+                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelPurp,}]}>
 
-                        <Text style={styles.metaIcon}>📅</Text>
                         <Text style={styles.metaLabel}>Date</Text>
                         <Text style={styles.metaValue}>{date}</Text>
 
                     </View>
 
-                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelGreen, transform: [{rotate: '1.5deg'}], }]}>
-                        <Text style={styles.metaIcon}>🕐</Text>
+                    <View style={[styles.metaCard, {backgroundColor: T.COLORS.pastelOrange, }]}>
                         <Text style={styles.metaLabel}>Time</Text>
                         <Text style={styles.metaValue}>{time}</Text>
                     </View>
@@ -227,7 +225,7 @@ export default function RecordingScreen(){
                     backgroundColor: isRecording ? (isPaused?T.COLORS.pastelOrange:T.COLORS.pastelPink): T.COLORS.myWhite,
 
                     transform: [
-                        {rotate:isRecording?'-1deg' : '1deg'}, {scale: pulsingAnimation},
+                         {scale: pulsingAnimation},
                     ],
                 }]}>
                     <Text style={styles.timer}>{formatDuration(duration)}</Text>
@@ -242,7 +240,7 @@ export default function RecordingScreen(){
                             backgroundColor: T.COLORS.lightText
                         }]} onPress={startRecording} activeOpacity={0.85}>
                             <Text style={[styles.mainBtnText, {color: T.COLORS.lightBg}]}>
-                                🎙️ start recording
+                                start recording
                             </Text>
                         </TouchableOpacity>
                     ) : (
@@ -283,91 +281,100 @@ const styles = StyleSheet.create({
     }, 
     
     heroCard: {
-        borderRadius: 24,
-        padding: 24,
-        marginBottom: 16,
+        borderRadius: 28,
+        padding: 28,
+        marginBottom: -12,
         transform: [{rotate: '-1.5deg'}],
+        zIndex: 1,
         shadowColor: '#000',
         shadowOffset: {
-            width: 0,
-            height: 4
+            width: 2,
+            height: 6,
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 12,
-        elevation: 4,
+        shadowOpacity: 0.12,
+        shadowRadius: 14,
+        elevation: 5,
     }, 
 
     heroText: {
-        fontSize: 38,
+        fontSize: 46,
         fontFamily: T.FONTS_FAMILY.extrabold,
         color: T.COLORS.lightMuted,
-        letterSpacing: -1.5,
-        lineHeight: 44,
+        letterSpacing: -2,
+        lineHeight: 42,
     }, 
 
     heroSub: {
         fontSize: T.FONT.md,
+
         color: T.COLORS.lightText,
         opacity: 0.6,
-        marginTop: 8,
-        fontWeight: '600',
+        marginTop: 12,
+        fontFamily: T.FONTS_FAMILY.bold,
     },
     
     subjectCard: {
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 16,
-        transform: [{rotate: '1deg'}],
+        borderRadius: 24,
+        padding: 14,
+        marginBottom: 2,
+        transform: [{rotate: '-1deg'}],
+        zIndex: 2,
         shadowColor: '#000',
+        alignSelf: 'center',
+        minWidth: '55%',
         shadowOffset: {
-            width: 0,
-            height: 3,
+            width: 2,
+            height: 6,
         }, shadowOpacity: 0.1,
-        shadowRadius: 10,
-        elevation: 3,
+        shadowRadius: 12,
+        elevation: 4,
     },
 
     cardLabel: {
         fontSize: T.FONT.xs,
         fontFamily: T.FONTS_FAMILY.extrabold,
         color: T.COLORS.lightText,
-        letterSpacing: 2,
-        opacity: 0.5,
-        marginBottom: 8,
+        letterSpacing: 1.5,
+        opacity: 0.45,
+        marginBottom: 5,
     },
 
     subjectInput: {
-        fontSize: T.FONT.xl,
+        fontSize: 22,
         fontFamily: T.FONTS_FAMILY.bold,
         color: T.COLORS.lightText,
-        letterSpacing: -0.5
+        letterSpacing: -1,
     },
     
     metaRow: {
         flexDirection: 'row',
-        gap:12,
+        gap:10,
         marginBottom: T.SPACING.md,
+        zIndex: 3,
     },
     metaCard: {
         flex:1, 
-        borderRadius: 20, alignItems:'center', gap: T.SPACING.xs, padding: T.SPACING.md,
+        borderRadius: 20, 
+        alignItems:'center', 
+        marginTop: 20,
+        gap: 4, 
+        padding: T.SPACING.md,
         shadowColor: '#000',
         shadowOffset: {
-            width: 0,
-            height: 3,
+            width: 1,
+            height: 4,
         },
         shadowOpacity: 0.1,
         shadowRadius: 8,
-        elevation: 3,
+        elevation: 5,
     },
-    metaIcon: {fontSize: 24,},
     metaLabel: {fontSize: T.FONT.xs,
         color: T.COLORS.lightMuted,
         fontFamily: T.FONTS_FAMILY.bold,
-        letterSpacing: 1.5,
+        letterSpacing: 3,
     },
     metaValue: {
-        fontSize: T.FONT.sm,
+        fontSize: 13,
         color: T.COLORS.lightText,
         fontFamily: T.FONTS_FAMILY.bold,
         textAlign: 'center',
@@ -376,52 +383,59 @@ const styles = StyleSheet.create({
     timerCard: {
         alignItems: 'center', 
         marginBottom: T.SPACING.lg,
-        padding: T.SPACING.xl,
-        borderRadius: 24,
+        marginTop: 5,
+        padding: 18,
+        borderRadius: 28,
         shadowColor: '#000',
         shadowOffset: {
-            width: 0,
-            height: 4,
+            width: 2,
+            height: 6,
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 12,
-        elevation: 4,
+        shadowOpacity: 0.1,
+        shadowRadius: 14,
+        elevation: 8,
 
     },
     timer: {
-        fontSize: 76,
+        fontSize: 80,
         fontFamily: T.FONTS_FAMILY.extrabold,
         color: T.COLORS.lightText,
         letterSpacing: -4,
+        marginTop: -15,
     }, 
     timerStatus: {
         fontSize: T.FONT.md,
         color: T.COLORS.lightText,
-        marginTop: T.SPACING.xs,
+        marginTop: 4,
+        opacity: 0.5,
+        letterSpacing: 1,
         fontFamily: T.FONTS_FAMILY.bold,
     }, 
     
     buttonArea: {
         alignItems: 'center',
         marginBottom: T.SPACING.md,
-
+        zIndex: 5,
     }, 
     
     mainBtn: {
-        paddingHorizontal: 48, paddingVertical: 18,
+        backgroundColor: T.COLORS.lightText,
+        paddingHorizontal: 52, paddingVertical: 20,
         borderRadius: T.RADIUS.full,
         shadowColor: '#000',
         shadowOffset: {width:0,
-            height: 4
+            height: 6
         },
         shadowOpacity: 0.2,
-        shadowRadius: 12,
-        elevation: 6,
+        shadowRadius: 14,
+        elevation: 10,
     },
     mainBtnText:{
         fontSize: T.FONT.lg,
         fontFamily: T.FONTS_FAMILY.extrabold,
-        letterSpacing: -0.3,
+        color: T.COLORS.lightBg,
+        letterSpacing: -0.5,
+        marginTop: -4,
     },
 
     controlRow: {
@@ -430,7 +444,7 @@ const styles = StyleSheet.create({
     },
 
     controlBtn: {
-        paddingHorizontal: 28,
+        paddingHorizontal: 32,
         paddingVertical: T.SPACING.md,
         borderRadius: T.RADIUS.full,
         elevation: 4,
@@ -444,10 +458,13 @@ const styles = StyleSheet.create({
         color: T.COLORS.lightText,
         fontSize: T.FONT.base,
         fontFamily: T.FONTS_FAMILY.bold,
+        letterSpacing: -3,
     },
     tip: {
         textAlign: 'center', color: T.COLORS.lightSubtle,
         fontSize: T.FONT.sm,
+        fontFamily: T.FONTS_FAMILY.bold,
         lineHeight: 20,
+        marginTop: T.SPACING.sm,
     }
 }) 
