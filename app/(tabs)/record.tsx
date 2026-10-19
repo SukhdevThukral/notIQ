@@ -223,14 +223,10 @@ export default function RecordingScreen(){
 
                 <Animated.View style={[styles.timerCard, {
                     backgroundColor: isRecording ? (isPaused?T.COLORS.pastelOrange:T.COLORS.pastelPink): T.COLORS.myWhite,
-
-                    transform: [
-                         {scale: pulsingAnimation},
-                    ],
                 }]}>
                     <Text style={styles.timer}>{formatDuration(duration)}</Text>
                     <Text style={styles.timerStatus}>
-                        { !isRecording ? 'ready to record': isPaused? '⏸paused': '🔴 recording'}
+                        { !isRecording ? 'ready to record': isPaused? 'paused': '🔴 recording'}
                     </Text>
                 </Animated.View>
 
@@ -249,12 +245,12 @@ export default function RecordingScreen(){
                                 backgroundColor: isPaused ? T.COLORS.pastelGreen : T.COLORS.pastelOrange
                             }]} onPress={isPaused? resumingRecording:pauseRecording} activeOpacity={0.8}>
                                 <Text style={styles.controlBtnText}>
-                                    {isPaused ? '▶ RESUME' : '⏸ PAUSE'}
+                                    {isPaused ? 'RESUME' : 'PAUSE'}
                                 </Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity style={[styles.controlBtn, {backgroundColor: T.COLORS.pastelPink}]} onPress={stopRecording} activeOpacity={0.8}>
-                                <Text style={styles.controlBtnText}>⏹ STOP</Text>
+                                <Text style={styles.controlBtnText}>STOP</Text>
                             </TouchableOpacity>
                         </View>
                     )}
