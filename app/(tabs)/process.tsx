@@ -81,6 +81,62 @@ export default function ProcessScreen() {
             </SafeAreaView>
         );
     }
+
+    const isDone = selected.status === "done";
+
+    return(
+        <SafeAreaView style={s.safe}>
+            <StatusBar style="dark"/>
+            <ScrollView contentContainerStyle={s.scroll}>
+
+                <TouchableOpacity onPress={()=> {
+                    setSelected(null);
+                    load();
+                }} style={s.back}>
+                    <Text style={s.backText}>← all lectures</Text>
+                </TouchableOpacity>
+
+                <View style={[s.heroCard, {
+                    backgroundColor: getSubjectColor(selected.subject)
+                }]}>
+                    <Text style={s.heroSubject}>{selected.subject}</Text>
+                    <Text style={s.heroMeta}>{selected.date} · {selected.duration}</Text>
+                </View>
+
+                {!isDone && !processing && (
+                    <TouchableOpacity style={s.processBtn} onPress={()=> {
+                        processLecture(selected)
+                    }} activeOpacity={0.9}>
+                        <Text style={s.processBtnText}>process lecture</Text>
+                    </TouchableOpacity>
+                )}
+
+                {processing && (
+                    <View style={s.loadingCard}>
+                        <ActivityIndicator size="large" color={T.COLORS.lightText}/>
+                        <Text style={s.loadingStep}>{step}</Text>
+                        <Text style={s.loadingHint}>this takes a while, dont close the app</Text>
+                    </View>
+                )}
+
+                {isDone  && (
+                    <>
+                        <View style={s.tabs}>
+                            {(["notes", "flashcards", "hints"] as Tab[]).map((t)=> {
+                                <TouchableOpacity key={t} style={[s.tabBtn, tab === t && s.tabBtnActive]} onPress={()=> {
+                                    setTab(t)
+                                }}>
+                                    
+                                    <Text style={[s.tabBtnText, tab === t && s.tabBtnTextActive]}>{t}</Text>
+
+                                </TouchableOpacity>
+                            })}
+                        </View>
+                    </>
+                )}
+            </ScrollView>
+        </SafeAreaView>
+    )
 }
 
 function StatusBadge({status} : {status: Lecture["status"] }) {
@@ -198,4 +254,54 @@ const s = StyleSheet.create({
     heroMeta : {
         fontSize: T.FONT.sm, fontFamily: T.FONTS_FAMILY.bold, color: T.COLORS.lightMuted, marginTop: 4 
     },
+
+    processBtn:{
+        backgroundColor: T.COLORS.lightText,
+        borderRadius: T.RADIUS.full, paddingVertical: 18,
+        alignItems: "center",
+        marginBottom: T.SPACING.lg,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 6,
+        }, shadowOpacity: 0.3, shadowRadius: 14, elevation: 10,
+    },
+
+    processBtnText: {
+        fontSize: T.FONT.lg, fontFamily: T.FONTS_FAMILY.extrabold,
+        color: T.COLORS.lightBg, letterSpacing: -0.5
+    },
+    
+
+    loadingCard: {
+        backgroundColor: T.COLORS.myWhite,
+        borderRadius: 24,
+        padding: T.SPACING.xl,
+        alignItems: "center",
+        marginBottom: T.SPACING.lg,
+        gap: T.SPACING.sm
+    },
+
+    loadingStep: {
+        fontSize: T.FONT.md, fontFamily :T.FONTS_FAMILY.bold,
+        color: T.COLORS.lightText, marginTop: T.SPACING.sm
+    },
+
+    loadingHint: {
+        fontSize: T.FONT.sm, fontFamily: T.FONTS_FAMILY.bold, color: T.COLORS.lightSubtle,
+        textAlign: "center",
+    },
+
+    tabs: {
+        flexDirection:"row", gap: 8, marginBottom: T.SPACING.md
+    },
+
+    tabBtn: {
+        flex: 1,  paddingVertical: 10, borderRadius: T.RADIUS.full,
+        backgroundColor: T.COLORS.myWhite, alignItems: "center",
+    },
+
+    tabBtnActive: {
+        fontSize
+    }
 })
