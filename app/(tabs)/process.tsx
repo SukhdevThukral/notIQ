@@ -73,23 +73,53 @@ export default function ProcessScreen() {
                                     <Text style={s.lectureSubj}>{lect.subject}</Text>
                                     <Text style={s.lectureMeta}>{lect.date} · {lect.duration}</Text>
                                 </View>
+                                <StatusBadge status={lect.status}/>
                             </View>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
             </SafeAreaView>
-        )
+        );
     }
 }
 
+function StatusBadge({status} : {status: Lecture["status"] }) {
+    const map: Record<Lecture["status"], {label: string; bg: string}> = {
+        recorded: {
+            label: "recorded", bg: T.COLORS.pastelBlue,
+        }, processing: {
+            label: "processing...", bg: T.COLORS.pastelOrange,
+        },  done : {
+            label :"done!", bg: T.COLORS.pastelGreen,
+        }, error: {
+            label: "error", bg: T.COLORS.pastelPink,
+        },
+    };
 
-const sB = StyleSheet.create({
+    const {
+        label, bg  
+    } = map[status];
+
+    return (
+        <View style={[statusb.badge]}>
+            <Text style={statusb.text}>{label}</Text>
+        </View>
+    );
+}
+
+const statusb = StyleSheet.create({
     text: {
         fontSize: T.FONT.xs,
         fontFamily:  T.FONTS_FAMILY.bold,
         color: T.COLORS.lightText
-    }
-})
+    }, 
+
+    badge: {
+        borderRadius: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 4
+    },
+});
 
 const s = StyleSheet.create({
     safe:{
@@ -115,5 +145,57 @@ const s = StyleSheet.create({
         color: T.COLORS.lightSubtle, fontFamily: T.FONTS_FAMILY.bold, fontSize: T.FONT.md, marginTop: 60
     },
 
+    lectureCard: {
+        borderRadius: 24,
+        padding: T.SPACING.md,
+        marginBottom: T.SPACING.sm,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 1,
+            height: 4,
+        }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4
+    },
 
+    lectureRow: {
+        flexDirection: 'row',
+        alignItems: "center",
+    }, 
+
+    lectureSubj: {
+        fontSize: T.FONT.lg,
+        fontFamily: T.FONTS_FAMILY.extrabold,
+        color: T.COLORS.lightText, letterSpacing: -0.5
+    },
+
+    lectureMeta: {
+        fontSize: T.FONT.sm,
+        fontFamily: T.FONTS_FAMILY.bold, color: T.COLORS.lightMuted,
+        marginTop: 2
+    },
+
+    back: {
+        marginBottom: T.SPACING.md
+    },
+
+    backText: {
+        fontSize: T.FONT.sm, fontFamily: T.FONTS_FAMILY.bold, color: T.COLORS.lightMuted
+    },
+
+    heroCard: {
+        borderRadius: 28, padding: 24,
+        marginBottom: T.SPACING.lg,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 2, height: 6
+        }, shadowOpacity: 0.1,
+        shadowRadius: 14, elevation: 5
+    },
+
+    heroSubject: {
+        fontSize: 40, fontFamily: T.FONTS_FAMILY.extrabold, color: T.COLORS.lightText, letterSpacing :-2
+    },
+
+    heroMeta : {
+        fontSize: T.FONT.sm, fontFamily: T.FONTS_FAMILY.bold, color: T.COLORS.lightMuted, marginTop: 4 
+    },
 })
