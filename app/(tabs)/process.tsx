@@ -4,13 +4,11 @@ import{
 } from  "react-native"
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import AsyncStorage, { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import * as T from "@/constants";
-
 import { getSubjectColor } from "../utils";
 import { Lecture, Tab } from "../types";
-
+import { transcribeAudio, processingWithAI } from "../api";
 import { getLectures, upsertLecture } from "../storage";
 
 export default function ProcessScreen() {
@@ -40,11 +38,24 @@ export default function ProcessScreen() {
 
         try{
             setStep("transcribing audio...");
-            // const transcript =
+            const transcript = await transcribeAudio(lecture.audioUri);
 
-            setStep("generating notes & flashcards...")
-        } catch{
-            
+            setStep("generating notes & flashcards...");
+            const {notes, flashcards, examHints} = await processingWithAI(transcript, lecture.subject);
+
+            const updated: Lecture = {...lecture, transcript, notes, flashcards, examHints, status: "done"};
+
+            const next = await upsertLecture(updated)
+
+            setLectures(next);
+            setSelected(updated);
+        } catch(err:any){
+            Alert.alert("Error", err.message ?? "Something went wrong.");
+            const errored: Lecture = {...lecture, status: "error"};
+            const next = await upsertLecture(errored);
+
+            setLectures(next);
+            setSelected(errored);
         } finally{
             setProcessing(false);
             setStep("");
