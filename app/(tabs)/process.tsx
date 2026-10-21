@@ -119,19 +119,50 @@ export default function ProcessScreen() {
                     </View>
                 )}
 
-                {isDone  && (
-                    <>
+                {isDone && (
+                        <>
                         <View style={s.tabs}>
-                            {(["notes", "flashcards", "hints"] as Tab[]).map((t)=> {
-                                <TouchableOpacity key={t} style={[s.tabBtn, tab === t && s.tabBtnActive]} onPress={()=> {
+                            {(["notes", "flashcards", "hints"] as Tab[]).map((t) => (
+                                <TouchableOpacity key={t} style={[s.tabBtn, tab === t && s.tabBtnActive]}
+                                onPress={() => {
                                     setTab(t)
                                 }}>
-                                    
-                                    <Text style={[s.tabBtnText, tab === t && s.tabBtnTextActive]}>{t}</Text>
 
+                                <Text style={[s.tabBtnText, tab === t && s.tabBtnTextActive]}>{t}</Text>
+                                
                                 </TouchableOpacity>
-                            })}
+                            ))}
                         </View>
+
+                        {tab === "notes" && (
+                            <View style={s.contentCard}>
+                                <Text style={s.notesText}>{selected.notes}</Text>
+                            </View>
+                        )}
+
+                        {tab === "flashcards" && selected.flashcards.map((fcs, i)=> (
+                            <TouchableOpacity key={i} style={[s.flashCard, {
+                                backgroundColor: flipped[i] ? T.COLORS.pastelPurp : T.COLORS.myWhite
+                            }]} onPress={()=>  setFlipped((f)=> ({...f, [i]: !f[i] }))} activeOpacity={0.9}>
+
+                                <Text style={s.flashCardLABEL}>{flipped[i] ? "ANSWER" : "QUESTION"}</Text>
+
+                                <Text style={s.flashCardTEXT}>
+                                    {flipped[i] ? fcs.back : fcs.front}
+                                </Text>
+
+                                <Text style={s.flashCardHINT}>
+                                    tap to flip
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+
+                        {tab === "hints" && selected.examHints.map((hint, i)=>(
+                            <View key={i} style={s.hintCard}>
+                                <Text style={s.hintNum}>0{i+1}</Text>
+                                <Text style={s.hintText}>{hint}</Text>
+                            </View>
+                        ))}
                     </>
                 )}
             </ScrollView>
@@ -302,6 +333,89 @@ const s = StyleSheet.create({
     },
 
     tabBtnActive: {
-        fontSize
-    }
+        backgroundColor: T.COLORS.lightText,
+    },
+
+    tabBtnText: {
+        fontSize: T.FONT.sm, 
+        fontFamily: T.FONTS_FAMILY.bold,
+        color:  T.COLORS.lightMuted,
+        letterSpacing: 0.5, 
+    },
+
+    tabBtnTextActive: {
+        color: T.COLORS.lightBg,
+    },
+
+    contentCard: {
+        backgroundColor: T.COLORS.myWhite,
+        borderRadius: 24,
+        padding: T.SPACING.lg,
+    },
+
+    notesText: {
+        fontSize: T.FONT.sm,
+        fontFamily: T.FONTS_FAMILY.bold, 
+        color: T.COLORS.lightText,
+        lineHeight: 22,
+    },
+
+    flashCard: {
+        borderRadius: 24,
+        padding: T.SPACING.lg, 
+        marginBottom: T.SPACING.sm,
+        alignItems: "center",
+        minHeight: 140, justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 1,
+            height: 4,
+        }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4,
+    },
+
+    flashCardLABEL: {
+        fontSize: T.FONT.xs,
+        fontFamily: T.FONTS_FAMILY.extrabold,
+        color: T.COLORS.lightText,
+        letterSpacing: 2,
+        marginBottom: T.SPACING.sm,
+    },
+
+    flashCardTEXT: {
+        fontSize: T.FONT.base,
+        fontFamily: T.FONTS_FAMILY.bold,
+        color: T.COLORS.lightText, textAlign: "center",
+        letterSpacing: -0.3,
+    },
+
+    flashCardHINT: {
+        fontSize: T.FONT.xs,
+        color: T.COLORS.lightSubtle, fontFamily: T.FONTS_FAMILY.bold, marginTop: T.SPACING.sm,
+    },
+
+    hintCard: {
+        backgroundColor: T.COLORS.pastelOrange, borderRadius: 20, 
+        padding: T.SPACING.md,
+        marginBottom: T.SPACING.sm, flexDirection: "row",
+        alignItems: "flex-start",
+        gap: T.SPACING.sm,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 1, height: 3,
+        }, shadowOpacity: 0.1, shadowRadius: 6, elevation: 3
+    },
+
+    hintNum: {
+        fontSize: 28, fontFamily: T.FONTS_FAMILY.extrabold, color: T.COLORS.lightText,
+        opacity: 0.2, letterSpacing: -1,
+    },
+
+    hintText:{
+        flex:1,
+        fontSize: T.FONT.sm,
+        fontFamily: T.FONTS_FAMILY.bold,
+        color: T.COLORS.lightText,
+        lineHeight: 20,
+        marginTop: 6,
+    },
 })
