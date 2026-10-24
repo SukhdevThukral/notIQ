@@ -1,13 +1,13 @@
 import { flashCard } from "./types"
 
-const openrouter_key = "";
-const assemblyAI_key = "";
+const openrouter_key = process.env.EXPO_PUBLIC_OPENROUTER_KEY!;
+const assemblyAI_key = process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY!;
 
 export async function transcribeAudio(audioUri :string):Promise<string>{
     const formData = new FormData();
 
-    formData.append("file", {
-        uri: audioUri, name: "lectture.m4a",
+    formData.append("file", { 
+        uri: audioUri, name: "lecture.m4a",
         type: "audio/m4a"
     } as any);
 
@@ -65,7 +65,7 @@ export async function processingWithAI(
     {
         "notes" : "well-structured markdown notes with heading, bullet points, and key concepts highlighted",
         "flashcards": [{"front": "question or term", "back" : "answer or definition"}],
-        "examHint": ["likely exam question or high priority concept as a short string"]
+        "examHints": ["likely exam question or high priority concept as a short string"]
     }
 
     Rules:  
@@ -81,7 +81,7 @@ export async function processingWithAI(
             "authorization": `Bearer ${openrouter_key}`,
         },
         body: JSON.stringify({
-            model: "openrouter/free",
+            model: "nvidia/nemotron-3-super-120b-a12b:free",
             messages: [{
                 role: "user",
                 content: prompt
@@ -92,5 +92,11 @@ export async function processingWithAI(
     const data = await res.json();
     const raw = data.choices?.[0]?.message?.content ?? "{}";
 
-    return JSON.parse(raw);
+    const cleaned = raw.replace(/```json\n?/g, "").replace(/```/g, "").trim();
+
+    try {
+        return JSON.parse(cleaned);
+    } catch{ 
+        throw new Error("AI returned invalid JSON - try again");
+    }
 }
