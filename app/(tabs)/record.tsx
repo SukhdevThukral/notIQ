@@ -4,6 +4,8 @@ import {View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animate
 
 //utils.ts
 
+import {useRouter} from 'expo-router';
+
 import { getFormattedDate, getFormattedTime, formatDuration, getSubjectColor } from "../utils";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,6 +17,7 @@ import {StatusBar} from 'expo-status-bar';
 
 export default function RecordingScreen(){
     const [subject,setSubject] = useState('');
+    const router = useRouter();
     const [date] = useState(getFormattedDate());
     const [time, setTime] = useState(getFormattedTime());
     const [isRecording,setIsRecording] = useState(false);
@@ -118,6 +121,7 @@ export default function RecordingScreen(){
         try{
             await audioRecorder.stop();
             const uri = audioRecorder.uri;
+            console.log("Recorded URI", uri)
 
             const lectureData = {
                 id: Date.now().toString(),
@@ -143,8 +147,23 @@ export default function RecordingScreen(){
 
             Alert.alert(
                 'LECTURE SAVED!',
-                `${subject} - ${formatDuration(duration)}\n\nReady to process into notes.`
+                `${subject} - ${formatDuration(duration)}`,
+                [
+                    {text: 'later', style: 'cancel'},
+                    {
+                        text: 'process now →',
+                        onPress: () => {
+                            router.push({
+                                pathname: '/process',
+                                params: {
+                                    autoId: lectureData.id
+                                }
+                            })
+                        },
+                    },
+                ]
             );
+
         } catch(err){
             Alert.alert('Error', 'Could not stop recording.');
             console.error(err);
