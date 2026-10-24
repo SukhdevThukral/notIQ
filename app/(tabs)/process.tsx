@@ -3,6 +3,8 @@ import{
     View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, ActivityIndicator
 } from  "react-native"
 
+import { useRef } from "react";
+import { useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as T from "@/constants";
@@ -18,16 +20,39 @@ export default function ProcessScreen() {
     const [step, setStep] = useState("");
     const [tab, setTab] = useState<Tab>("notes");
     const [flipped, setFlipped] = useState<Record<number, boolean>>({});
+    const {autoId} = useLocalSearchParams<{autoId? : string}>();
+    const autoTriggered = useRef(false);
 
     useEffect(()=> {
         load();
     }, [])
+
+    useEffect(()=> {
+
+        console.log("autoId effect fire:", autoId, "lectures:", lectures.length, "triggered:", autoTriggered.current);
+
+        if (!autoId || autoTriggered.current || lectures.length === 0){
+            return;
+        }
+
+        const target = lectures.find((l)=> l.id === autoId);
+
+        if (!target) return;
+        autoTriggered.current = true;
+        setSelected(target);
+        setTab("notes");
+        processLecture(target);
+    }, [lectures, autoId]);
 
     async function load() {
         setLectures(await getLectures());
     }
 
     async function processLecture(lecture: Lecture){
+        console.log("processLecture called:", lecture.id);
+        console.log("audioUri:", lecture.audioUri);
+        console.log("subject:", lecture.subject);
+
         if (!lecture.audioUri){
             Alert.alert("No audio", "This lecture has no recording attached");
             return;
@@ -116,7 +141,7 @@ export default function ProcessScreen() {
 
                 {!isDone && !processing && (
                     <TouchableOpacity style={s.processBtn} onPress={()=> {
-                        processLecture(selected)
+                        console.log("process button tapped, selected:", selected?.id); processLecture(selected)
                     }} activeOpacity={0.9}>
                         <Text style={s.processBtnText}>process lecture</Text>
                     </TouchableOpacity>
