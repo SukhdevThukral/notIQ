@@ -3,15 +3,16 @@ import{
     View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, ActivityIndicator
 } from  "react-native"
 
-import { useRef } from "react";
-import { useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StatusBar } from "expo-status-bar";
+import { useRef,useCallback} from "react";
+import { useLocalSearchParams, useFocusEffect } from "expo-router";
+import {SafeAreaView } from "react-native-safe-area-context";
+import {StatusBar } from "expo-status-bar";
 import * as T from "@/constants";
 import { getSubjectColor } from "../utils";
 import { Lecture, Tab } from "../types";
 import { transcribeAudio, processingWithAI } from "../api";
 import { getLectures, upsertLecture } from "../storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProcessScreen() {
     const [lectures, setLectures] =  useState<Lecture[]>([]);
@@ -27,22 +28,40 @@ export default function ProcessScreen() {
         load();
     }, [])
 
-    useEffect(()=> {
+    useFocusEffect(
+        useCallback(()=>{
 
-        console.log("autoId effect fire:", autoId, "lectures:", lectures.length, "triggered:", autoTriggered.current);
+            async function autoProcess() {
 
-        if (!autoId || autoTriggered.current || lectures.length === 0){
-            return;
-        }
+                const pendingId = await AsyncStorage.getItem('pendingProcessId');
+                console.log("focus fired, pendingId:", pendingId);
+                if (!pendingId) return;
 
-        const target = lectures.find((l)=> l.id === autoId);
+                await AsyncStorage.removeItem('pendingProcessId');
 
-        if (!target) return;
-        autoTriggered.current = true;
-        setSelected(target);
-        setTab("notes");
-        processLecture(target);
-    }, [lectures, autoId]);
+                const all = await getLectures();
+                setLectures(all);
+
+                const target = all.find((l)=> l.id === autoId);
+                console.log("focus  - autoId:", autoId, "target:", target?.id);
+
+                if(!target){
+                    return;
+                }
+
+                autoTriggered.current = true;
+                setSelected(target);
+                setTab("notes");
+                processLecture(target);
+            }
+
+            autoProcess();
+
+            return ()=> {
+                autoTriggered.current = false;
+            };
+        }, [autoId])
+    )
 
     async function load() {
         setLectures(await getLectures());

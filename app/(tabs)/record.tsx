@@ -152,14 +152,12 @@ export default function RecordingScreen(){
                     {text: 'later', style: 'cancel'},
                     {
                         text: 'process now →',
-                        onPress: () => {
-                            router.push({
-                                pathname: '/process',
-                                params: {
-                                    autoId: lectureData.id
-                                }
-                            })
-                        },
+                        onPress: 
+                            async () => {
+                                await AsyncStorage.setItem('pendingProcessId', lectureData.id);
+                                router.push('/(tabs)/process');
+                            }
+                        ,
                     },
                 ]
             );
