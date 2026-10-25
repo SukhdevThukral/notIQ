@@ -80,7 +80,7 @@ export async function processingWithAI(
     - examHints: 5-8 specific things likely to appear on an exam
     `;
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.EXPO_PUBLIC_GEMINI_KEY}`, {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.EXPO_PUBLIC_GEMINI_KEY}`  , {
         method: "POST",
         headers: {
             "content-type": "application/json",
