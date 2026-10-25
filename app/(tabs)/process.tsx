@@ -23,16 +23,12 @@ import { getLectures, upsertLecture } from "../storage";
 
 export default function ProcessScreen() {
 
-    console.log("=== PROCESS SCREEN RENDERED");
-
     const [lectures, setLectures] =  useState<Lecture[]>([]);
     const [selected, setSelected ] = useState<Lecture | null>(null);
     const [processing, setProcessing] = useState(false);
     const [step, setStep] = useState("");
     const [tab, setTab] = useState<Tab>("notes");
     const [flipped, setFlipped] = useState<Record<number, boolean>>({});
-    const {autoId} = useLocalSearchParams<{autoId? : string}>();
-    const autoTriggered = useRef(false);
 
     useEffect(()=> {
         load();
@@ -41,7 +37,6 @@ export default function ProcessScreen() {
     useFocusEffect(
         useCallback(()=>{
             async function autoProcess() {
-                console.log("=== FOCUS FIRED ===, pendingId:", pendingProcessId);
                 if (!pendingProcessId) return;
 
                 const id = pendingProcessId;
@@ -51,7 +46,6 @@ export default function ProcessScreen() {
                 setLectures(all);
 
                 const target = all.find((l)=> l.id === id);
-                console.log("target:", target?.id);
 
                 if(!target){
                     return;
@@ -71,10 +65,6 @@ export default function ProcessScreen() {
     }
 
     async function processLecture(lecture: Lecture){
-        console.log("processLecture called:", lecture.id);
-        console.log("audioUri:", lecture.audioUri);
-        console.log("subject:", lecture.subject);
-
         if (!lecture.audioUri){
             Alert.alert("No audio", "This lecture has no recording attached");
             return;
@@ -162,8 +152,7 @@ export default function ProcessScreen() {
                 </View>
 
                 {!isDone && !processing && (
-                    <TouchableOpacity style={s.processBtn} onPress={()=> {
-                        console.log("process button tapped, selected:", selected?.id); processLecture(selected)
+                    <TouchableOpacity style={s.processBtn} onPress={()=> {processLecture(selected)
                     }} activeOpacity={0.9}>
                         <Text style={s.processBtnText}>process lecture</Text>
                     </TouchableOpacity>
@@ -244,7 +233,6 @@ export default function ProcessScreen() {
 
                         {tab === "flashcards" && (
                             <>
-                                {console.log("FC:", selected.flashcards?.length, JSON.stringify(selected.flashcards?.[0]))}
 
                                 {(selected.flashcards ?? []).map((fcs, i) => (
                                     <TouchableOpacity key={i} style={[s.flashCard, 
@@ -265,7 +253,6 @@ export default function ProcessScreen() {
 
                         {tab === "hints" && (
                             <>
-                                {console.log("HINTS:", selected.examHints?.length, JSON.stringify(selected.examHints?.[0]))}
 
                                 {(selected.examHints ?? []).map((hint, i)=> (
                                     <View key={i} style={s.hintCard}>
