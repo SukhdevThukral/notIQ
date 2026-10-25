@@ -61,23 +61,22 @@ export async function processingWithAI(
     transcript : string,
     subject: string
 ) : Promise<{notes: string; flashcards: flashCard[]; examHints: string[]}> {
-    const prompt = `you are an expert academic assistand and a student just recorded a ${subject} lecture. and here is the transcript: 
+    const prompt = `a student recorded a ${subject} lecture. Here is the EXACT transcript: 
     
     <transcript>
     ${transcript}
     </transcript>
 
-    return ONLY a valid JSON object (no markdown, no explanation) with this exact shape:
+    Your job is to ONLY use what is said in the transcript above, do NOT add outside knowledge, do NOT make up content, do NOT expand beyond what was literally spoken.
+
+    return ONLY a valid JSON object with this exact shape:
     {
-        "notes" : "well-structured markdown notes with heading, bullet points, and key concepts highlighted",
-        "flashcards": [{"front": "question or term", "back" : "answer or definition"}],
-        "examHints": ["likely exam question or high priority concept as a short string"]
+        "notes" : "structured notes using ONLY what was said in the transcript, with ## heading a nd bullet points",
+        "flashcards": [{"front": "question based ONLY on transcript content", "back" : "answer from ttranscript ONLY"}],
+        "examHints": ["specific things mentioned in the transcript that could appear on an exam"]
     }
 
-    Rules:  
-    - notes: comprehensive but scannable, use ## for sections, bold key terms
-    - flashcards: 8-15 cards covering the most 
-    - examHints: 5-8 specific things likely to appear on an exam
+    If the transcript has very little academic content, reflect that  with absolute honesty,short notes, few flashcards. Do NOT pad or invent.
     `;
 
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.EXPO_PUBLIC_GEMINI_KEY}`  , {
