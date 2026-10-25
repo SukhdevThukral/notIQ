@@ -16,6 +16,8 @@ import * as T from "@/constants";
 import { getSubjectColor } from "../utils";
 import { Lecture, Tab } from "../types";
 import { transcribeAudio, processingWithAI } from "../api";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getLectures, upsertLecture } from "../storage";
 
 
@@ -93,7 +95,7 @@ export default function ProcessScreen() {
             const next = await upsertLecture(updated)
 
             setLectures(next);
-            setSelected(updated);
+            setSelected({...updated});
         } catch(err:any){
             Alert.alert("Error", err.message ?? "Something went wrong.");
             const errored: Lecture = {...lecture, status: "error"};
@@ -192,7 +194,6 @@ export default function ProcessScreen() {
 
                         {tab === "notes" && (
                             <View style={s.contentCard}>
-                                {console.log("---->notes content:", typeof selected.notes, selected.notes)}
                                 <Markdown style={{
                                     body: {
                                         fontFamily: T.FONTS_FAMILY.bold, 
@@ -241,29 +242,39 @@ export default function ProcessScreen() {
                             </View>
                         )}
 
-                        {tab === "flashcards" && selected.flashcards.map((fcs, i)=> (
-                            <TouchableOpacity key={i} style={[s.flashCard, {
-                                backgroundColor: flipped[i] ? T.COLORS.pastelPurp : T.COLORS.myWhite
-                            }]} onPress={()=>  setFlipped((f)=> ({...f, [i]: !f[i] }))} activeOpacity={0.9}>
+                        {tab === "flashcards" && (
+                            <>
+                                {console.log("FC:", selected.flashcards?.length, JSON.stringify(selected.flashcards?.[0]))}
 
-                                <Text style={s.flashCardLABEL}>{flipped[i] ? "ANSWER" : "QUESTION"}</Text>
+                                {(selected.flashcards ?? []).map((fcs, i) => (
+                                    <TouchableOpacity key={i} style={[s.flashCard, 
+                                        {
+                                            backgroundColor: flipped[i] ? T.COLORS.pastelPurp: T.COLORS.myWhite
 
-                                <Text style={s.flashCardTEXT}>
-                                    {flipped[i] ? fcs.back : fcs.front}
-                                </Text>
+                                        }]} onPress={() => setFlipped((f) => ({...f, [i]: !f[i]}))} activeOpacity={0.9}>
 
-                                <Text style={s.flashCardHINT}>
-                                    tap to flip
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                                            <Text style={s.flashCardLABEL}>{flipped[i] ? "ANSWER": "QUESTION"}</Text>
+                                            
+                                            <Text style={s.flashCardTEXT}>{flipped[i] ? fcs.back: fcs.front}</Text>
 
-                        {tab === "hints" && selected.examHints.map((hint, i)=>(
-                            <View key={i} style={s.hintCard}>
-                                <Text style={s.hintNum}>0{i+1}</Text>
-                                <Text style={s.hintText}>{hint}</Text>
-                            </View>
-                        ))}
+                                            <Text style={s.flashCardHINT}>tap to flip</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </>
+                        )}
+
+                        {tab === "hints" && (
+                            <>
+                                {console.log("HINTS:", selected.examHints?.length, JSON.stringify(selected.examHints?.[0]))}
+
+                                {(selected.examHints ?? []).map((hint, i)=> (
+                                    <View key={i} style={s.hintCard}>
+                                        <Text style={s.hintNum}>0{i+1}</Text>
+                                        <Text style={s.hintText}>{hint}</Text>
+                                    </View>
+                                ))}
+                            </>
+                        )}
                     </>
                 )}
             </ScrollView>
