@@ -6,6 +6,8 @@ import {View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animate
 
 import {useRouter} from 'expo-router';
 
+import { setPendingId } from "../store";
+
 import { getFormattedDate, getFormattedTime, formatDuration, getSubjectColor } from "../utils";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -152,10 +154,10 @@ export default function RecordingScreen(){
                     {text: 'later', style: 'cancel'},
                     {
                         text: 'process now →',
-                        onPress: 
-                            async () => {
-                                await AsyncStorage.setItem('pendingProcessId', lectureData.id);
-                                router.push('/(tabs)/process');
+                        onPress: () => {
+                            setPendingId(lectureData.id);
+                            console.log("=== set pendingId:", lectureData.id);
+                            router.navigate('/(tabs)/process');
                             }
                         ,
                     },
