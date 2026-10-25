@@ -1,4 +1,5 @@
 import { flashCard } from "./types"
+import * as FileSystem from 'expo-file-system/legacy';
 
 console.log("KEYS:", process.env.EXPO_PUBLIC_OPENROUTER_KEY, process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY)
 
@@ -6,20 +7,22 @@ const openrouter_key = process.env.EXPO_PUBLIC_OPENROUTER_KEY!;
 const assemblyAI_key = process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY!;
 
 export async function transcribeAudio(audioUri :string):Promise<string>{
-    const formData = new FormData();
 
-    formData.append("file", { 
-        uri: audioUri, name: "lecture.m4a",
-        type: "audio/m4a"
-    } as any);
+    console.log("=== uploading: ", audioUri);
 
-    const uploadRes = await fetch("https://api.assemblyai.com/v2/upload", {
-        method: "POST", headers: {
-            authorization: assemblyAI_key
-        }, body: formData,
-    });
+    const uploadRes = await FileSystem.uploadAsync(
+        "https://api.assemblyai.com/v2/upload", audioUri, {
+            httpMethod: "POST",  
+            uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+            headers: {
+                authorization: assemblyAI_key,
+            },
+        }
+    );
 
-    const {upload_url} = await uploadRes.json();
+    console.log("=== upload result:", uploadRes.body);
+
+    const {upload_url} = JSON.parse(uploadRes.body);
 
     const transcriptRes = await fetch("https://api.assemblyai.com/v2/transcript", {
         method: "POST", headers: {
@@ -43,6 +46,7 @@ export async function transcribeAudio(audioUri :string):Promise<string>{
 
         const result = await poll.json();
 
+        console.log("-> poll status:", result.status);
         if(result.status === "completed"){
             return result.text as string;
         }
