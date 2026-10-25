@@ -18,3 +18,10 @@ export async function upsertLecture(updated: Lecture): Promise<Lecture[]> {
     await saveLectures(next);
     return next;
 }
+
+export async function deleteLecture(id: string): Promise<Lecture[]> {
+    const all = await getLectures();
+    const next = all.filter((l)=> l.id  !==  id);
+    await saveLectures(next);
+    return next;
+}
