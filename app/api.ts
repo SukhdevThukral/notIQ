@@ -1,5 +1,7 @@
 import { flashCard } from "./types"
 
+console.log("KEYS:", process.env.EXPO_PUBLIC_OPENROUTER_KEY, process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY)
+
 const openrouter_key = process.env.EXPO_PUBLIC_OPENROUTER_KEY!;
 const assemblyAI_key = process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY!;
 
