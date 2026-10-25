@@ -1,9 +1,9 @@
 import { flashCard } from "./types"
 import * as FileSystem from 'expo-file-system/legacy';
 
-console.log("KEYS:", process.env.EXPO_PUBLIC_OPENROUTER_KEY, process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY)
+console.log("KEYS:", process.env.EXPO_PUBLIC_GEMINI_KEY, process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY)
 
-const openrouter_key = process.env.EXPO_PUBLIC_OPENROUTER_KEY!;
+console.log("GEMINI KEY:", process.env.EXPO_PUBLIC_GEMINI_KEY);
 const assemblyAI_key = process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY!;
 
 export async function transcribeAudio(audioUri :string):Promise<string>{
@@ -80,23 +80,20 @@ export async function processingWithAI(
     - examHints: 5-8 specific things likely to appear on an exam
     `;
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.EXPO_PUBLIC_GEMINI_KEY}`, {
         method: "POST",
         headers: {
             "content-type": "application/json",
-            "authorization": `Bearer ${openrouter_key}`,
         },
         body: JSON.stringify({
-            model: "nvidia/nemotron-3-super-120b-a12b:free",
-            messages: [{
-                role: "user",
-                content: prompt
-            }],
+            contents:[{parts: [{text:prompt}]}]
         }),
     });
 
     const data = await res.json();
-    const raw = data.choices?.[0]?.message?.content ?? "{}";
+    console.log("---> raw ai response:", JSON.stringify(data));
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
+    console.log("---> raw content:", raw);
 
     const cleaned = raw.replace(/```json\n?/g, "").replace(/```/g, "").trim();
 
