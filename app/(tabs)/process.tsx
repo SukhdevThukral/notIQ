@@ -5,6 +5,10 @@ import{
 
 import { useRef,useCallback} from "react";
 import { useLocalSearchParams, useFocusEffect } from "expo-router";
+
+// @ts-ignore
+import Markdown from '@ronradtke/react-native-markdown-display';
+
 import {SafeAreaView } from "react-native-safe-area-context";
 import { pendingProcessId, clearPendingId } from "../store";
 import {StatusBar } from "expo-status-bar";
@@ -13,9 +17,12 @@ import { getSubjectColor } from "../utils";
 import { Lecture, Tab } from "../types";
 import { transcribeAudio, processingWithAI } from "../api";
 import { getLectures, upsertLecture } from "../storage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function ProcessScreen() {
+
+    console.log("=== PROCESS SCREEN RENDERED");
+
     const [lectures, setLectures] =  useState<Lecture[]>([]);
     const [selected, setSelected ] = useState<Lecture | null>(null);
     const [processing, setProcessing] = useState(false);
@@ -185,7 +192,13 @@ export default function ProcessScreen() {
 
                         {tab === "notes" && (
                             <View style={s.contentCard}>
-                                <Text style={s.notesText}>{selected.notes}</Text>
+                                {console.log("---->notes content:", typeof selected.notes, selected.notes)}
+                                <Markdown style={{
+                                    body: {
+                                        fontFamily: T.FONTS_FAMILY.bold, fontSize: T.FONT.sm, color: T.COLORS.lightText, lineHeight: 22,
+                                }, heading2: {fontFamily: T.FONTS_FAMILY.extrabold, fontSize: T.FONT.lg, color: T.COLORS.lightText, marginTop: 12, marginBottom: 4}, strong: {fontFamily: T.FONTS_FAMILY.extrabold}, bullet_list: {marginLeft:8},}}>
+                                    {String(selected.notes ?? '')}
+                                </Markdown>
                             </View>
                         )}
 
