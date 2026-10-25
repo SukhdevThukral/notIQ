@@ -6,6 +6,7 @@ import{
 import { useRef,useCallback} from "react";
 import { useLocalSearchParams, useFocusEffect } from "expo-router";
 import {SafeAreaView } from "react-native-safe-area-context";
+import { pendingProcessId, clearPendingId } from "../store";
 import {StatusBar } from "expo-status-bar";
 import * as T from "@/constants";
 import { getSubjectColor } from "../utils";
@@ -30,37 +31,30 @@ export default function ProcessScreen() {
 
     useFocusEffect(
         useCallback(()=>{
-
             async function autoProcess() {
+                console.log("=== FOCUS FIRED ===, pendingId:", pendingProcessId);
+                if (!pendingProcessId) return;
 
-                const pendingId = await AsyncStorage.getItem('pendingProcessId');
-                console.log("focus fired, pendingId:", pendingId);
-                if (!pendingId) return;
-
-                await AsyncStorage.removeItem('pendingProcessId');
+                const id = pendingProcessId;
+                clearPendingId();
 
                 const all = await getLectures();
                 setLectures(all);
 
-                const target = all.find((l)=> l.id === autoId);
-                console.log("focus  - autoId:", autoId, "target:", target?.id);
+                const target = all.find((l)=> l.id === id);
+                console.log("target:", target?.id);
 
                 if(!target){
                     return;
                 }
 
-                autoTriggered.current = true;
                 setSelected(target);
                 setTab("notes");
                 processLecture(target);
             }
 
             autoProcess();
-
-            return ()=> {
-                autoTriggered.current = false;
-            };
-        }, [autoId])
+        }, [])
     )
 
     async function load() {
