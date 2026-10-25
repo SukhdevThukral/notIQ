@@ -157,7 +157,7 @@ export default function RecordingScreen(){
                         onPress: () => {
                             setPendingId(lectureData.id);
                             console.log("=== set pendingId:", lectureData.id);
-                            router.navigate('/(tabs)/process');
+                            router.replace('/(tabs)/process');
                             }
                         ,
                     },
