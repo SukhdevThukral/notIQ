@@ -195,9 +195,48 @@ export default function ProcessScreen() {
                                 {console.log("---->notes content:", typeof selected.notes, selected.notes)}
                                 <Markdown style={{
                                     body: {
-                                        fontFamily: T.FONTS_FAMILY.bold, fontSize: T.FONT.sm, color: T.COLORS.lightText, lineHeight: 22,
-                                }, heading2: {fontFamily: T.FONTS_FAMILY.extrabold, fontSize: T.FONT.lg, color: T.COLORS.lightText, marginTop: 12, marginBottom: 4}, strong: {fontFamily: T.FONTS_FAMILY.extrabold}, bullet_list: {marginLeft:8},}}>
+                                        fontFamily: T.FONTS_FAMILY.bold, 
+                                        fontSize: T.FONT.sm, 
+                                        color: T.COLORS.lightText, 
+                                        lineHeight: 22,
+                                    }, 
+                                    heading1: {
+                                        fontFamily: T.FONTS_FAMILY.extrabold,
+                                        fontSize: 28,
+                                        color:  T.COLORS.lightText,
+                                        marginTop: 16,
+                                        marginBottom: 6,
+                                        backgroundColor: T.COLORS.pastelPurp,
+                                        padding: 8,
+                                        borderRadius: 10,
+                                    },
+
+                                    heading2: 
+                                    {fontFamily: T.FONTS_FAMILY.extrabold, 
+                                        fontSize: T.FONT.lg, 
+                                        color: T.COLORS.lightText, 
+                                        marginTop: 14, 
+                                        marginBottom: 4, backgroundColor: T.COLORS.pastelGreen, padding: 6, borderRadius: 8,}, 
+                                    
+                                    strong: {fontFamily: T.FONTS_FAMILY.extrabold, color: T.COLORS.lightText, backgroundColor: T.COLORS.pastelPink}, bullet_list: {marginLeft:8, marginTop: 4},
+
+                                    list_item: {
+                                        marginBottom: 4
+                                    }, bullet_list_icon : {
+                                        color: T.COLORS.pastelPurp, fontSize: 18
+                                    }, code_inline: {
+                                        backgroundColor: T.COLORS.pastelBlue,
+                                        borderRadius: 4,
+                                        paddingHorizontal: 4,
+                                        fontFamily: T.FONTS_FAMILY.bold,
+                                    },
+                                    blockquote: {
+                                        backgroundColor: T.COLORS.pastelOrange, borderRadius: 8, padding: 9, marginVertical: 4,
+                                    },
+                                }}>
+
                                     {String(selected.notes ?? '')}
+
                                 </Markdown>
                             </View>
                         )}
