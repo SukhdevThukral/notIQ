@@ -123,7 +123,7 @@ export default function RecordingScreen(){
         try{
             await audioRecorder.stop();
             const uri = audioRecorder.uri;
-            console.log("Recorded URI", uri)
+            
 
             const lectureData = {
                 id: Date.now().toString(),
@@ -156,7 +156,6 @@ export default function RecordingScreen(){
                         text: 'process now →',
                         onPress: () => {
                             setPendingId(lectureData.id);
-                            console.log("=== set pendingId:", lectureData.id);
                             router.replace('/(tabs)/process');
                             }
                         ,
