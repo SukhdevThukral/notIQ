@@ -18,7 +18,7 @@ import { Lecture, Tab } from "../types";
 import { transcribeAudio, processingWithAI } from "../api";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getLectures, upsertLecture } from "../storage";
+import { getLectures, upsertLecture, deleteLecture } from "../storage";
 
 
 export default function ProcessScreen() {
@@ -137,12 +137,30 @@ export default function ProcessScreen() {
             <StatusBar style="dark"/>
             <ScrollView contentContainerStyle={s.scroll}>
 
-                <TouchableOpacity onPress={()=> {
-                    setSelected(null);
-                    load();
-                }} style={s.back}>
-                    <Text style={s.backText}>← all lectures</Text>
-                </TouchableOpacity>
+
+                <View style={{flexDirection: 'row',  justifyContent: 'space-between', alignItems: 'center', marginBottom: T.SPACING.md}}>
+
+                    <TouchableOpacity onPress={()=> {
+                        setSelected(null);
+                        load();
+                    }} style={s.back}>
+                        <Text style={s.backText}>← all lectures</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity onPress={()=> {
+                        Alert.alert('delete lecture?', 'this cannot be undone', [
+                            {text: 'cancel', style: 'cancel'},
+                            {text: 'delete', style: 'destructive', onPress: async () => {
+                                const next= await deleteLecture(selected.id);
+                                setLectures(next);
+                                setSelected(null);
+                            }},
+                        ]);
+                    }} style={s.deleteBtn}>
+                        <Text style={s.deleteBtnText}>delete</Text>
+                    </TouchableOpacity>
+                </View>
+
 
                 <View style={[s.heroCard, {
                     backgroundColor: getSubjectColor(selected.subject)
@@ -324,6 +342,21 @@ const s = StyleSheet.create({
         fontFamily: T.FONTS_FAMILY.extrabold, color: T.COLORS.lightText,
         letterSpacing: -2,
         marginBottom: T.SPACING.lg
+    },
+
+    deleteBtn: {
+        alignSelf: 'flex-end',
+        marginBottom: T.SPACING.md,
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        backgroundColor: T.COLORS.pastelPink,
+        borderRadius: T.RADIUS.full,
+    },
+
+    deleteBtnText: {
+        fontSize: T.FONT.sm,
+        fontFamily: T.FONTS_FAMILY.bold,
+        color: T.COLORS.lightText,
     },
 
     empty:  {
