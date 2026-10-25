@@ -1,5 +1,5 @@
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import RecordingScreen from "./app/(tabs)/record";
+import { Slot } from "expo-router";
 import {useFonts} from 'expo-font';
 
 import {
@@ -19,7 +19,7 @@ export default function App(){
   }
   return(
     <SafeAreaProvider>
-      <RecordingScreen/>
+      <Slot/>
     </SafeAreaProvider>
   );
 }
