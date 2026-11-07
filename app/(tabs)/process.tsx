@@ -74,13 +74,17 @@ export default function ProcessScreen() {
         setFlipped({});
 
         try{
-            setStep("transcribing audio...");
-            const transcript = await transcribeAudio(lecture.audioUri);
+            let transcript = lecture.transcript;
+            
+            if (!transcript){
+                setStep("transcribing audio...");
+                transcript = await transcribeAudio(lecture.audioUri);
 
-            const partial: Lecture = {...lecture, transcript, status: "processing"};
-            const partialNext = await upsertLecture(partial);
-            setLectures(partialNext);
-            setSelected(partial);
+                const partial: Lecture = {...lecture, transcript, status: "processing"};
+                const partialNext = await upsertLecture(partial);
+                setLectures(partialNext);
+                setSelected(partial);
+            }
 
             setStep("generating notes & flashcards...");
             const {notes, flashcards, examHints} = await processingWithAI(transcript, lecture.subject);
@@ -94,7 +98,6 @@ export default function ProcessScreen() {
             Alert.alert("Error", err.message ?? "Something went wrong.");
             const errored: Lecture = {...lecture, status: "error"};
             const next = await upsertLecture(errored);
-
             setLectures(next);
             setSelected(errored);
         } finally{
@@ -223,6 +226,10 @@ export default function ProcessScreen() {
                             <AudioPlayer uri={selected.audioUri}/>
                         )}
                         
+                        <TouchableOpacity style={s.reprocessBtn} onPress={()=> processLecture(selected)} activeOpacity={0.8}>
+                            <Text style={s.reprocessBtnText}>↺ reprocess</Text>
+                        </TouchableOpacity>
+
                         <View style={s.tabs}>
                             {(["notes", "flashcards", "hints"] as Tab[]).map((t) => (
                                 <TouchableOpacity key={t} style={[s.tabBtn, tab === t && s.tabBtnActive]}
@@ -586,5 +593,19 @@ const s = StyleSheet.create({
         color: T.COLORS.lightText,
         lineHeight: 20,
         marginTop: 6,
+    },
+    reprocessBtn:{
+        alignSelf: 'center',
+        marginBottom: T.SPACING.md,
+        paddingHorizontal: T.SPACING.lg,
+        paddingVertical: T.SPACING.sm,
+        backgroundColor: T.COLORS.pastelPurp,
+        borderRadius: T.RADIUS.full,
+    },
+    reprocessBtnText: {
+        fontSize: T.FONT.sm,
+        fontFamily: T.FONTS_FAMILY.bold,
+        color: T.COLORS.lightText,
+        letterSpacing: 0.5,
     },
 })
