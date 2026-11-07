@@ -77,15 +77,19 @@ export default function ProcessScreen() {
             setStep("transcribing audio...");
             const transcript = await transcribeAudio(lecture.audioUri);
 
+            const partial: Lecture = {...lecture, transcript, status: "processing"};
+            const partialNext = await upsertLecture(partial);
+            setLectures(partialNext);
+            setSelected(partial);
+
             setStep("generating notes & flashcards...");
             const {notes, flashcards, examHints} = await processingWithAI(transcript, lecture.subject);
 
             const updated: Lecture = {...lecture, transcript, notes, flashcards, examHints, status: "done"};
-
             const next = await upsertLecture(updated)
-
             setLectures(next);
             setSelected({...updated});
+
         } catch(err:any){
             Alert.alert("Error", err.message ?? "Something went wrong.");
             const errored: Lecture = {...lecture, status: "error"};
@@ -181,6 +185,35 @@ export default function ProcessScreen() {
                         <ActivityIndicator size="large" color={T.COLORS.lightText}/>
                         <Text style={s.loadingStep}>{step}</Text>
                         <Text style={s.loadingHint}>this takes a while, dont close the app</Text>
+
+                        {selected?.transcript && step.includes("generating") && (
+                            <View style={{
+                                marginTop: T.SPACING.sm,
+                                backgroundColor: T.COLORS.lightBg,
+                                borderRadius: 16,
+                                padding: T.SPACING.sm,
+                                maxHeight: 100,
+                                width: '100%',
+                            }}>
+                                <Text style={{
+                                    fontSize: T.FONT.xs,
+                                    fontFamily: T.FONTS_FAMILY.extrabold,
+                                    color: T.COLORS.lightSubtle,
+                                    letterSpacing: 1,
+                                    marginBottom: 6,
+                                }}>TRANSCRIPT</Text>
+                                <ScrollView showsVerticalScrollIndicator={false}>
+                                    <Text style={{
+                                        fontSize: T.FONT.xs,
+                                        fontFamily: T.FONTS_FAMILY.bold,
+                                        color: T.COLORS.lightMuted,
+                                        lineHeight: 18,
+                                    }}>
+                                        {selected.transcript}
+                                    </Text>
+                                </ScrollView>
+                            </View>
+                        )}
                     </View>
                 )}
 
