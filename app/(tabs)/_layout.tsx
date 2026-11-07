@@ -1,5 +1,6 @@
 import { Tabs } from "expo-router";
 import * as T from '@/constants';
+import { Image } from "react-native";
 
 export default function TabLayout() {
     return (
@@ -14,9 +15,16 @@ export default function TabLayout() {
                 fontSize: 11,
             }
         }}>
-            <Tabs.Screen name="index" options={{title: 'home'}}/>
-            <Tabs.Screen name="record" options={{title: 'record'}}/>
-            <Tabs.Screen name="process" options={{title: 'process'}}/>
+            <Tabs.Screen name="record" 
+                        options={{title: 'home', tabBarIcon: ({color}) => (
+                        <Image source={require('../../assets/home.png')} 
+                        style={{width:24, height:24, tintColor: color}}/>
+            ),}}/>
+            <Tabs.Screen name="process" 
+                        options={{title: 'process', tabBarIcon: ({color}) => (
+                        <Image source={require('../../assets/refresh.png')} 
+                        style={{width:24, height:24, tintColor: color}}/>
+            ),}}/>
         </Tabs>
     );
 }
