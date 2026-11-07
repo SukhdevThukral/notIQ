@@ -28,7 +28,7 @@ export async function transcribeAudio(audioUri :string):Promise<string>{
 
     while(true){
         await new Promise((r)=> {
-            setTimeout(r, 3000)
+            setTimeout(r, 1500)
         });
 
         const poll = await fetch(`https://api.assemblyai.com/v2/transcript/${id}`, {
@@ -53,18 +53,37 @@ export async function processingWithAI(
     subject: string
 ) : Promise<{notes: string; flashcards: flashCard[]; examHints: string[]}> {
     const prompt = `a student recorded a ${subject} lecture. Here is the EXACT transcript: 
-    
+     
     <transcript>
     ${transcript}
     </transcript>
 
     Your job is to ONLY use what is said in the transcript above, do NOT add outside knowledge, do NOT make up content, do NOT expand beyond what was literally spoken.
 
+    NOTES  RULES: 
+    - Write proper structured notes, NOT a transcript dump or bullet-point list of everything said.
+    - Identify  the key concepts, definitions, and explanations the teacher gave
+    - Group related ideas under ## headings by topic
+    - Summarise and rephrase in clear student freindly langauge
+    - Use bullet points only for genuine list type content (steps, examples, comparisons or etc.)
+    - Bold (**example**) only the most important terms or definitions
+
+    EXAM HINT RULES:
+    - ONLY include something if the teacher EXPLICITLY said it will be on the exam
+    - OR if the teacher repeated or heavily emphasised a specific point multiple times
+    - OR if the teacher slowed down, spelled something out, or said "remember this", "dont  forget", "pay attention to this" or etc.
+    - If none of these signals exist in the transcript, just  return an empty array []
+    - Do NOT just list topics that seem academically important - only what the teacher flagged
+
+    FLASHCARD RULES:
+    - Create question/answer pairs based only on key concepts from the transcript
+    - Questions should test understanding, not just recall of random sentences
+
     return ONLY a valid JSON object with this exact shape:
     {
-        "notes" : "structured notes using ONLY what was said in the transcript, with ## heading a nd bullet points",
-        "flashcards": [{"front": "question based ONLY on transcript content", "back" : "answer from ttranscript ONLY"}],
-        "examHints": ["specific things mentioned in the transcript that could appear on an exam"]
+        "notes" : "structured notes using markdown",
+        "flashcards": [{"front": "question based ONLY on transcript content", "back" : "answer from transcript ONLY"}],
+        "examHints": ["only explicitly flagged or heavily repeated content"]
     }
 
     If the transcript has very little academic content, reflect that  with absolute honesty,short notes, few flashcards. Do NOT pad or invent.
@@ -76,7 +95,14 @@ export async function processingWithAI(
             "content-type": "application/json",
         },
         body: JSON.stringify({
-            contents:[{parts: [{text:prompt}]}]
+            contents:[{parts: [{text:prompt}] }],
+            generationConfig: {
+                temperature: 0.3,
+                maxOutputTokens: 2048,
+            },
+            systemInstruction:{
+                parts: [{text: "You are a fast, concise note-taking assisstant. Be brief and effecient. Never over-explain."}]
+            }
         }),
     });
 
