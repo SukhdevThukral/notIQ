@@ -3,8 +3,8 @@ import{
     View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert, ActivityIndicator
 } from  "react-native"
 
-import { useRef,useCallback} from "react";
-import { useLocalSearchParams, useFocusEffect } from "expo-router";
+import { useCallback} from "react";
+import { useFocusEffect } from "expo-router";
 
 // @ts-ignore
 import Markdown from '@ronradtke/react-native-markdown-display';
@@ -17,8 +17,8 @@ import { getSubjectColor } from "../../src/utils";
 import { Lecture, Tab } from "../../src/types";
 import { transcribeAudio, processingWithAI } from "../../src/api";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getLectures, upsertLecture, deleteLecture } from "../../src/storage";
+import AudioPlayer from "@/src/AudioPlayer";
 
 
 export default function ProcessScreen() {
@@ -185,7 +185,11 @@ export default function ProcessScreen() {
                 )}
 
                 {isDone && (
-                        <>
+                    <>
+                        {selected.audioUri && (
+                            <AudioPlayer uri={selected.audioUri}/>
+                        )}
+                        
                         <View style={s.tabs}>
                             {(["notes", "flashcards", "hints"] as Tab[]).map((t) => (
                                 <TouchableOpacity key={t} style={[s.tabBtn, tab === t && s.tabBtnActive]}
