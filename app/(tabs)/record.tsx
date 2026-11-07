@@ -6,9 +6,9 @@ import {View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Animate
 
 import {useRouter} from 'expo-router';
 
-import { setPendingId } from "../store";
+import { setPendingId } from "../../src/store";
 
-import { getFormattedDate, getFormattedTime, formatDuration, getSubjectColor } from "../utils";
+import { getFormattedDate, getFormattedTime, formatDuration, getSubjectColor } from "../../src/utils";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import {useAudioRecorder, AudioModule, RecordingPresets} from 'expo-audio';
