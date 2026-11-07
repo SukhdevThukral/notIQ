@@ -10,15 +10,15 @@ import { useLocalSearchParams, useFocusEffect } from "expo-router";
 import Markdown from '@ronradtke/react-native-markdown-display';
 
 import {SafeAreaView } from "react-native-safe-area-context";
-import { pendingProcessId, clearPendingId } from "../store";
+import { pendingProcessId, clearPendingId } from "../../src/store";
 import {StatusBar } from "expo-status-bar";
 import * as T from "@/constants";
-import { getSubjectColor } from "../utils";
-import { Lecture, Tab } from "../types";
-import { transcribeAudio, processingWithAI } from "../api";
+import { getSubjectColor } from "../../src/utils";
+import { Lecture, Tab } from "../../src/types";
+import { transcribeAudio, processingWithAI } from "../../src/api";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getLectures, upsertLecture, deleteLecture } from "../storage";
+import { getLectures, upsertLecture, deleteLecture } from "../../src/storage";
 
 
 export default function ProcessScreen() {
