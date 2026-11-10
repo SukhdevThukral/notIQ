@@ -20,6 +20,7 @@ import { transcribeAudio, processingWithAI } from "../../src/api";
 import { getLectures, upsertLecture, deleteLecture } from "../../src/storage";
 import AudioPlayer from "@/src/AudioPlayer";
 
+import {Ionicons} from '@expo/vector-icons'
 
 export default function ProcessScreen() {
 
@@ -153,19 +154,27 @@ export default function ProcessScreen() {
                     }} style={s.back}>
                         <Text style={s.backText}>← all lectures</Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity onPress={()=> {
-                        Alert.alert('delete lecture?', 'this cannot be undone', [
-                            {text: 'cancel', style: 'cancel'},
-                            {text: 'delete', style: 'destructive', onPress: async () => {
-                                const next= await deleteLecture(selected.id);
-                                setLectures(next);
-                                setSelected(null);
-                            }},
-                        ]);
-                    }} style={s.deleteBtn}>
-                        <Text style={s.deleteBtnText}>delete</Text>
+
+                    <View style={{flexDirection: 'row', gap: 16, alignItems: 'center'}}>
+                    <TouchableOpacity onPress={()=> processLecture(selected)} activeOpacity={0.8}>
+                        <Ionicons name="refresh-outline" size={22} color={T.COLORS.lightText}/>
                     </TouchableOpacity>
+                    
+                        <TouchableOpacity onPress={()=> {
+                            Alert.alert('delete lecture?', 'this cannot be undone', [
+                                {text: 'cancel', style: 'cancel'},
+                                {text: 'delete', style: 'destructive', onPress: async () => {
+                                    const next= await deleteLecture(selected.id);
+                                    setLectures(next);
+                                    setSelected(null);
+                                }},
+                            ]);
+                        }}>
+                            <Ionicons name="trash-outline" size={22} color={T.COLORS.lightText}/>
+                        </TouchableOpacity>
+                    </View>
+
+
                 </View>
 
 
@@ -225,22 +234,20 @@ export default function ProcessScreen() {
                         {selected.audioUri && (
                             <AudioPlayer uri={selected.audioUri}/>
                         )}
-                        
-                        <TouchableOpacity style={s.reprocessBtn} onPress={()=> processLecture(selected)} activeOpacity={0.8}>
-                            <Text style={s.reprocessBtnText}>↺ reprocess</Text>
-                        </TouchableOpacity>
 
                         <View style={s.tabs}>
-                            {(["notes", "flashcards", "hints"] as Tab[]).map((t) => (
-                                <TouchableOpacity key={t} style={[s.tabBtn, tab === t && s.tabBtnActive]}
-                                onPress={() => {
-                                    setTab(t)
-                                }}>
 
-                                <Text style={[s.tabBtnText, tab === t && s.tabBtnTextActive]}>{t}</Text>
-                                
+                            {([
+                                {key: "notes", icon: "document-text-outline", label: "notes"},
+                                {key: "flashcards", icon: "albums-outline", label: "flashcards"},
+                                {key: "hints", icon: "bulb-outline", label: "hints"},
+                            ] as {key: Tab; icon: any; label: string}[]).map((t)=> (
+                                <TouchableOpacity key={t.key} style={[s.tabBtn, tab === t.key && s.tabBtnActive]} onPress={()=> setTab(t.key)}>
+                                    <Ionicons name={t.icon} size={16} color={tab === t.key ? T.COLORS.lightBg : T.COLORS.lightMuted} style={{marginTop: 2}}/>
+                                    <Text style={[s.tabBtnText, tab === t.key && s.tabBtnTextActive]}>{t.label}</Text>
                                 </TouchableOpacity>
                             ))}
+
                         </View>
 
                         {tab === "notes" && (
@@ -388,21 +395,6 @@ const s = StyleSheet.create({
         marginBottom: T.SPACING.lg
     },
 
-    deleteBtn: {
-        alignSelf: 'flex-end',
-        marginBottom: T.SPACING.md,
-        paddingHorizontal: 14,
-        paddingVertical: 6,
-        backgroundColor: T.COLORS.pastelPink,
-        borderRadius: T.RADIUS.full,
-    },
-
-    deleteBtnText: {
-        fontSize: T.FONT.sm,
-        fontFamily: T.FONTS_FAMILY.bold,
-        color: T.COLORS.lightText,
-    },
-
     empty:  {
         textAlign: "center",
         color: T.COLORS.lightSubtle, fontFamily: T.FONTS_FAMILY.bold, fontSize: T.FONT.md, marginTop: 60
@@ -417,6 +409,15 @@ const s = StyleSheet.create({
             width: 1,
             height: 4,
         }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4
+    },
+
+    iconBtn: {
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        backgroundColor: T.COLORS.myWhite,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 
     lectureRow: {
@@ -504,8 +505,8 @@ const s = StyleSheet.create({
     },
 
     tabBtn: {
-        flex: 1,  paddingVertical: 10, borderRadius: T.RADIUS.full,
-        backgroundColor: T.COLORS.myWhite, alignItems: "center",
+        flex: 1,  paddingVertical: 12, borderRadius: T.RADIUS.full,
+        backgroundColor: T.COLORS.myWhite, alignItems: "center", flexDirection: 'row', justifyContent: 'center', gap:8,
     },
 
     tabBtnActive: {
@@ -593,19 +594,5 @@ const s = StyleSheet.create({
         color: T.COLORS.lightText,
         lineHeight: 20,
         marginTop: 6,
-    },
-    reprocessBtn:{
-        alignSelf: 'center',
-        marginBottom: T.SPACING.md,
-        paddingHorizontal: T.SPACING.lg,
-        paddingVertical: T.SPACING.sm,
-        backgroundColor: T.COLORS.pastelPurp,
-        borderRadius: T.RADIUS.full,
-    },
-    reprocessBtnText: {
-        fontSize: T.FONT.sm,
-        fontFamily: T.FONTS_FAMILY.bold,
-        color: T.COLORS.lightText,
-        letterSpacing: 0.5,
     },
 })
