@@ -6,16 +6,22 @@ const assemblyAI_key = process.env.EXPO_PUBLIC_ASSEMBLYAI_KEY!;
 
 export async function transcribeAudio(audioUri :string):Promise<string>{
 
-    const uploadRes = await FileSystem.uploadAsync(
-        "https://api.assemblyai.com/v2/upload", audioUri, {
-            httpMethod: "POST",  
-            uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
-            headers: {
-                authorization: assemblyAI_key,
-            },
-        }
-    );
-    const {upload_url} = JSON.parse(uploadRes.body);
+    const base64 = await FileSystem.readAsStringAsync(audioUri, {
+        encoding: FileSystem.EncodingType.Base64,
+    });
+
+    const binary = Uint8Array.from(atob(base64), c=> c.charCodeAt(0));
+
+    const uploadRes = await fetch("https://api.assemblyai.com/v2/upload", {
+        method: "POST",
+        headers: {
+            authorization: assemblyAI_key,
+            "content-type": "application/octet-stream",
+        },
+        body: binary,
+    });
+    
+    const {upload_url} = await uploadRes.json();
 
     const transcriptRes = await fetch("https://api.assemblyai.com/v2/transcript", {
         method: "POST", headers: {
@@ -25,11 +31,16 @@ export async function transcribeAudio(audioUri :string):Promise<string>{
     })
 
     const {id}= await transcriptRes.json();
-
+    const max_wait = 5 *60 * 1000;
+    const started = Date.now();
     while(true){
         await new Promise((r)=> {
             setTimeout(r, 1500)
         });
+
+        if (Date.now() - started > max_wait){
+            throw new Error("Transcription timed out - recording may be too long. Try a shorter clip.");
+        }
 
         const poll = await fetch(`https://api.assemblyai.com/v2/transcript/${id}`, {
             headers: {
@@ -38,6 +49,7 @@ export async function transcribeAudio(audioUri :string):Promise<string>{
         });
 
         const result = await poll.json();
+
         if(result.status === "completed"){
             return result.text as string;
         }
