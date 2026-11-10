@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import * as T from '@/constants';
@@ -58,7 +58,7 @@ export default function AudioPlayer({uri}: Props) {
                         }
                     }
                 } activeOpacity={0.8}>
-                    <Text style={styles.playIcon}>{isPlaying ? '⏸' : '▶'}</Text>
+                    <Ionicons name={isPlaying ? 'pause' : 'play'} size={24} color={T.COLORS.lightBg} style={isPlaying ? {} : {marginLeft: 3}}/>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={()=> handleSeek('forward')} style={styles.skipBtn}>
@@ -129,10 +129,6 @@ const styles = StyleSheet.create({
         borderRadius: T.RADIUS.full,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    playIcon: {
-        fontSize: 22,
-        color: T.COLORS.lightBg,
     },
     skipBtn:{
         backgroundColor: T.COLORS.pastelPurp,
