@@ -15,6 +15,7 @@ import {StatusBar } from "expo-status-bar";
 import * as T from "@/constants";
 import { getSubjectColor } from "../../src/utils";
 import { Lecture, Tab } from "../../src/types";
+import { TextInput } from "react-native";
 import { transcribeAudio, processingWithAI } from "../../src/api";
 
 import { getLectures, upsertLecture, deleteLecture } from "../../src/storage";
@@ -30,6 +31,8 @@ export default function ProcessScreen() {
     const [step, setStep] = useState("");
     const [tab, setTab] = useState<Tab>("notes");
     const [flipped, setFlipped] = useState<Record<number, boolean>>({});
+    const [editingSubject, setEditingSubject] = useState(false);
+    const [subjectDraft, setSubjectDraft] = useState(''); 
 
     useEffect(()=> {
         load();
@@ -156,7 +159,7 @@ export default function ProcessScreen() {
                     </TouchableOpacity>
 
                     <View style={{flexDirection: 'row', gap: 16, alignItems: 'center'}}>
-                    <TouchableOpacity onPress={()=> processLecture(selected)} activeOpacity={0.8}>
+                    <TouchableOpacity onPress={()=> processLecture({...selected, transcript: undefined})} activeOpacity={0.6}>
                         <Ionicons name="refresh-outline" size={22} color={T.COLORS.lightText}/>
                     </TouchableOpacity>
                     
@@ -181,7 +184,22 @@ export default function ProcessScreen() {
                 <View style={[s.heroCard, {
                     backgroundColor: getSubjectColor(selected.subject)
                 }]}>
-                    <Text style={s.heroSubject}>{selected.subject}</Text>
+                    {editingSubject ? (
+                        <TextInput style={s.heroSubject} value={subjectDraft} onChangeText={setSubjectDraft} onBlur={async () => {
+                            const updated = {...selected, subject: subjectDraft.trim() || selected.subject};
+                            const next = await upsertLecture(updated);
+                            setLectures(next);
+                            setSelected(updated);
+                            setEditingSubject(false);
+                        }} autoFocus/>
+                    ) : (
+                        <TouchableOpacity onPress={() => {
+                            setSubjectDraft(selected.subject);
+                            setEditingSubject(true);
+                        }}>
+                            <Text style={s.heroSubject}>{selected.subject}</Text>
+                        </TouchableOpacity>
+                    )}
                     <Text style={s.heroMeta}>{selected.date} · {selected.duration}</Text>
                 </View>
 
