@@ -134,6 +134,7 @@ export default function RecordingScreen(){
                 flashcards: [],
                 notes: '',
                 examHints: [],
+                transcript: '',
                 createdAt: new Date().toISOString(),
             };
 
@@ -184,7 +185,7 @@ export default function RecordingScreen(){
                         </>
                     ) : (
                         <>
-                            <Text style={styles.heroText}>{isPaused ? 'take a{"\n"} breather' : `recording\n${subject}\ncovered`}</Text>
+                            <Text style={styles.heroText}>{isPaused ? `take a\nbreather` : `recording\n${subject}\ncovered`}</Text>
                             <Text style={styles.heroSub}>{isPaused ? 'resume when ready' : `screen can be off we gotchu!`}</Text>
                         </>
                     )}
@@ -444,7 +445,7 @@ const styles = StyleSheet.create({
         color: T.COLORS.lightText,
         fontSize: T.FONT.base,
         fontFamily: T.FONTS_FAMILY.bold,
-        letterSpacing: -3,
+        letterSpacing: -0.5,
     },
     tip: {
         textAlign: 'center', color: T.COLORS.lightSubtle,
