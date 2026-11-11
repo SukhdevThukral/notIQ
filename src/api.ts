@@ -76,6 +76,7 @@ export async function processingWithAI(
     - Write proper structured notes, NOT a transcript dump or bullet-point list of everything said.
     - Identify  the key concepts, definitions, and explanations the teacher gave
     - Group related ideas under ## headings by topic
+    - Convert spoken math into proper notation: "5 into 5" -> 5×5, "x squared" -> x², "root of 9" -> √9, "pi" -> π, etc. 
     - Summarise and rephrase in clear student freindly langauge
     - Use bullet points only for genuine list type content (steps, examples, comparisons or etc.)
     - Bold (**example**) only the most important terms or definitions
@@ -110,7 +111,7 @@ export async function processingWithAI(
             contents:[{parts: [{text:prompt}] }],
             generationConfig: {
                 temperature: 0.3,
-                maxOutputTokens: 2048,
+                maxOutputTokens: 8192,
             },
             systemInstruction:{
                 parts: [{text: "You are a fast, concise note-taking assisstant. Be brief and effecient. Never over-explain."}]
